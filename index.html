@@ -17,12 +17,14 @@ body.touch #touchUI .pad{position:fixed;bottom:16px;z-index:9;touch-action:none}
 #tJoyRKnob{position:absolute;left:24px;top:24px;width:44px;height:44px;border-radius:50%;background:rgba(220,140,130,.4);border:1px solid rgba(255,190,180,.5)}
 body.touch #touchUI .btn{position:fixed;z-index:9;width:40px;height:40px;border-radius:50%;background:rgba(40,50,35,.55);border:1px solid rgba(170,200,150,.4);color:#e8e3d0;font-size:17px;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;line-height:1}
 body.touch #touchUI .btn:active{background:rgba(90,120,80,.6)}
-#tBtnE{right:134px;bottom:126px}
-#tBtnR{right:82px;bottom:174px}
-#tBtnQ{right:186px;bottom:174px}
-#tBtnF{right:20px;bottom:174px}
-#tBtnG{right:134px;bottom:174px}
-#tBtnU{right:20px;bottom:222px}
+#tBtnFire{right:126px;bottom:104px;width:50px;height:50px;font-size:22px;background:rgba(120,40,30,.55);border-color:rgba(230,150,140,.5)}
+#tBtnFire:active{background:rgba(170,60,40,.65)}
+#tBtnE{right:184px;bottom:110px}
+#tBtnQ{right:126px;bottom:160px}
+#tBtnG{right:184px;bottom:160px}
+#tBtnR{right:126px;bottom:210px}
+#tBtnF{right:184px;bottom:210px}
+#tBtnU{right:126px;bottom:258px}
 #tBtnEsc{left:14px;top:14px;width:34px;height:34px;font-size:14px}
 #rotateHint{display:none;position:fixed;inset:0;z-index:100;background:#05070a;color:#cfd6cf;font-family:'Courier New',monospace;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:16px;letter-spacing:1px;line-height:1.6}
 body.touch.portrait #rotateHint{display:flex}
@@ -36,12 +38,13 @@ body.touch.portrait #game,body.touch.portrait .hud,body.touch.portrait #touchUI{
  #tJoyL{bottom:12px;width:88px;height:88px}
  #tJoyR{bottom:12px;width:82px;height:82px}
  body.touch #touchUI .btn{width:34px;height:34px;font-size:14px}
- #tBtnE{right:112px;bottom:104px}
- #tBtnR{right:68px;bottom:144px}
- #tBtnQ{right:156px;bottom:144px}
- #tBtnF{right:16px;bottom:144px}
- #tBtnG{right:112px;bottom:144px}
- #tBtnU{right:16px;bottom:184px}
+ #tBtnFire{right:104px;bottom:86px;width:42px;height:42px;font-size:18px}
+ #tBtnE{right:150px;bottom:92px}
+ #tBtnQ{right:104px;bottom:130px}
+ #tBtnG{right:150px;bottom:130px}
+ #tBtnR{right:104px;bottom:168px}
+ #tBtnF{right:150px;bottom:168px}
+ #tBtnU{right:104px;bottom:206px}
  #tBtnEsc{width:30px;height:30px;font-size:12px}
 }
 @media (max-height:520px){
@@ -98,10 +101,10 @@ button:hover{background:#24351a;box-shadow:0 0 16px rgba(120,200,120,.35)}
 #bossBar .bfill{height:100%;width:100%;background:linear-gradient(90deg,#7a1616,#c93a2f)}
 #runFlash{position:fixed;left:50%;top:22%;transform:translateX(-50%);font-family:'Courier New',monospace;font-size:44px;letter-spacing:8px;color:#ff2e22;text-shadow:0 0 24px rgba(255,30,20,.8),0 2px 2px #000;opacity:0;z-index:7;pointer-events:none;transition:opacity .2s}
 #runFlash.show{opacity:1}
-#tabletOverlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.86);display:flex;align-items:center;justify-content:center;font-family:'Courier New',monospace}
+#tabletOverlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.86);display:flex;align-items:center;justify-content:center;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:10px 0;box-sizing:border-box;font-family:'Courier New',monospace}
 #tabletOverlay.hidden{display:none}
-#tabletFrame{background:#0d100b;border:2px solid #2c3626;border-radius:18px;padding:16px;box-shadow:0 0 50px rgba(0,0,0,.85)}
-#phoneScreen{width:340px;height:560px;background:#0a1208;border:2px solid #1a2414;border-radius:10px;overflow:hidden;position:relative;box-shadow:inset 0 0 28px rgba(0,0,0,.7)}
+#tabletFrame{background:#0d100b;border:2px solid #2c3626;border-radius:18px;padding:16px;box-shadow:0 0 50px rgba(0,0,0,.85);flex:0 0 auto;margin:auto}
+#phoneScreen{width:min(340px,86vw);height:min(560px,64vh);background:#0a1208;border:2px solid #1a2414;border-radius:10px;overflow:hidden;position:relative;box-shadow:inset 0 0 28px rgba(0,0,0,.7)}
 .papp{width:100%;height:100%;color:#bcd6a8;display:flex;flex-direction:column;box-sizing:border-box}
 .papp.hidden{display:none}
 #phoneHome{flex-direction:row;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;padding:30px 16px}
@@ -141,9 +144,10 @@ button:hover{background:#24351a;box-shadow:0 0 16px rgba(120,200,120,.35)}
 <div id="touchUI">
  <div class="pad" id="tJoyL"><div id="tJoyLKnob"></div></div>
  <div class="pad" id="tJoyR"><div id="tJoyRKnob"></div></div>
+ <div class="btn" id="tBtnFire" title="Выстрел">🔫</div>
  <div class="btn" id="tBtnE" title="Взаимодействовать">✋</div>
  <div class="btn" id="tBtnR" title="Перезарядить">🔄</div>
- <div class="btn" id="tBtnQ" title="Дробовик">🔫</div>
+ <div class="btn" id="tBtnQ" title="Дробовик">💥</div>
  <div class="btn" id="tBtnF" title="Фонарик">🔦</div>
  <div class="btn" id="tBtnG" title="Граната">💣</div>
  <div class="btn" id="tBtnU" title="Радар">📡</div>
@@ -533,6 +537,7 @@ var keys={};
 var mouse={x:innerWidth/2,y:innerHeight/2,l:false,r:false};
 var touchMove={active:false,x:0,y:0};
 var touchAim={active:false,angle:0};
+var touchFire=false;
 var gTime=0,last=performance.now();
 var groundPat=null;
 var view={x0:0,y0:0,x1:0,y1:0};
@@ -713,13 +718,21 @@ addEventListener('contextmenu',function(e){e.preventDefault();});
   touchMove.x=Math.cos(a)*m;touchMove.y=Math.sin(a)*m;
  },function(){touchMove.active=false;touchMove.x=0;touchMove.y=0;});
  bindStick(joyR,knobR,38,function(nx,ny,m){
-  if(m>0.22){touchAim.active=true;touchAim.angle=Math.atan2(ny,nx);mouse.l=mode==='play';}
-  else mouse.l=false;
- },function(){mouse.l=false;});
+  if(m>0.12){touchAim.active=true;touchAim.angle=Math.atan2(ny,nx);}
+ },function(){});
  function btn(id,fn){
   var el=document.getElementById(id);
   el.addEventListener('touchstart',function(e){e.preventDefault();fn();},{passive:false});
   el.addEventListener('click',fn);
+ }
+ function holdBtn(id,onDown,onUp){
+  var el=document.getElementById(id);
+  el.addEventListener('touchstart',function(e){e.preventDefault();onDown();},{passive:false});
+  el.addEventListener('touchend',function(e){e.preventDefault();onUp();},{passive:false});
+  el.addEventListener('touchcancel',function(e){onUp();},{passive:false});
+  el.addEventListener('mousedown',function(e){e.preventDefault();onDown();});
+  el.addEventListener('mouseup',onUp);
+  el.addEventListener('mouseleave',onUp);
  }
  btn('tBtnE',function(){if(mode==='play')tryInteract();});
  btn('tBtnR',function(){if(mode==='play')reload();});
@@ -728,6 +741,7 @@ addEventListener('contextmenu',function(e){e.preventDefault();});
  btn('tBtnG',function(){throwGrenade();});
  btn('tBtnU',function(){activateRadar();});
  btn('tBtnEsc',function(){if(mode==='play')pauseGame();else if(mode==='paused')unpause();});
+ holdBtn('tBtnFire',function(){touchFire=true;},function(){touchFire=false;});
 })();
 
 function emitNoise(x,y,r){
@@ -847,7 +861,7 @@ function updatePlayer(dt){
   }
  }
  P.cd=Math.max(0,P.cd-dt);P.sgcd=Math.max(0,P.sgcd-dt);
- if(mouse.l&&P.cd<=0)firePistol();
+ if((mouse.l||touchFire)&&P.cd<=0)firePistol();
  if(mouse.r&&P.sgcd<=0&&P.hasShotgun)fireShotgun();
 }
 function update(dt){
@@ -1418,6 +1432,7 @@ function openTablet(){
 function closeTablet(){
  tabletOpen=false;
  tabletOverlayEl.classList.add('hidden');
+ touchFire=false;mouse.l=false;
  if(pending47){pending47=false;snipeArmed=true;snipeT=0;snipeAngle=Math.random()*TAU;}
 }
 function showPhoneApp(app){
@@ -1767,6 +1782,7 @@ function start(){
 }
 function pauseGame(){
  mode='paused';
+ touchFire=false;mouse.l=false;
  if(AC)AC.suspend();
  showScreen('<h1 style="letter-spacing:12px">'+L('ПАУЗА','PAUSED')+'</h1><div class="sub">ESC — '+L('продолжить','resume')+'</div>'+
  '<button data-act="resume">'+L('ПРОДОЛЖИТЬ','RESUME')+'</button>'+
