@@ -208,7 +208,7 @@ var TORCHES=[{x:HUT2.x,y:HUT2.y-150,id:'top'},{x:HUT2.x-165,y:HUT2.y-10,id:'left
 
 /* ---- localization ---- */
 var SAVE_KEY='poz_les_save_v1';
-var save={lang:'ru',vol:0.9,rangerUnlocked:false,costume:'patrol',ach:{},calls:{}};
+var save={lang:'ru',vol:0.9,rangerUnlocked:false,costume:'patrol',ach:{},calls:{},catBest:0};
 (function loadSave(){
  try{
   var raw=localStorage.getItem(SAVE_KEY);
@@ -227,11 +227,12 @@ var ACH_LIST=[
  {id:'merc',icon:'merc',ru:'Наемник из Восточной Европы',en:'Mercenary from Eastern Europe',dru:'Устраните Призрака-убийцу',den:'Eliminate the Ghost-Killer'},
  {id:'bug',icon:'bug',ru:'Охотник за багами',en:'Bug Hunter',dru:'Наберите номер 404',den:'Dial the number 404'},
  {id:'faust',icon:'faust',ru:'Фауст',en:'Faust',dru:'Вы продали душу дьяволу',den:'You sold your soul to the devil'},
- {id:'potap',icon:'potap',ru:'Потап',en:'Potap',dru:'Наберите 5 очков в Hero-Cat',den:'Score 5 points in Hero-Cat'},
+ {id:'potap',icon:'potap',ru:'Потап',en:'Potap',dru:'Наберите 20 очков в Hero-Cat',den:'Score 20 points in Hero-Cat'},
  {id:'bald',icon:'bald',ru:'Погоняло «Лысый»',en:'Nickname "Baldy"',dru:'Вас устранил агент 47',den:'You were eliminated by Agent 47'},
  {id:'krab',icon:'krab',ru:'Красти Краб',en:'Krusty Krab',dru:'Вам ответил Патрик',den:'Patrick picked up the phone'},
  {id:'forester_pal',icon:'tree',ru:'Лесник леснику - товарищ',en:'Forester to Forester',dru:'Пройдите первое патрулирование полностью в костюме «Лесник»',den:'Complete the first patrol fully wearing the "Ranger" costume'},
- {id:'masha',icon:'masha',ru:'Маша и медведь',en:'Masha and the Bear',dru:'Победите Медведя-Шатуна, не убив ни одного волка',den:'Defeat the Rogue Bear without killing a single wolf'},
+ {id:'masha',icon:'masha',ru:'Маша и медведь',en:'Masha and the Bear',dru:'Пройдите Медведя-шатуна, не получив  урона ',den:'Beat the bear boss without taking a single hit (keep all 5 hearts)'},
+ {id:'detective',icon:'detective',ru:'Детектив',en:'Detective',dru:'Пройдите первое патрулирование, собрав все улики',den:'Complete the first patrol having collected every clue'},
  {id:'boss_of_bosses',icon:'crown',ru:'Босс всех боссов',en:'Boss of Bosses',dru:'Получите все достижения',den:'Earn every other achievement'}
 ];
 function unlockAch(id){
@@ -387,7 +388,10 @@ var sfx={
  uiTap:function(){tone(900,0.03,0.08,'square');},
  flap:function(){tone(500,0.06,0.14,'square',700);},
  fish:function(){tone(900,0.06,0.16,'triangle',1400);},
- splat:function(){nz(0.2,500,120,0.3);}
+ splat:function(){nz(0.2,500,120,0.3);},
+ starve:function(){tone(320,0.3,0.22,'sine',140);setTimeout(function(){if(AC)tone(230,0.4,0.18,'sine',90);},160);},
+ catRecord:function(){tone(700,0.09,0.2,'triangle',1000);setTimeout(function(){if(AC)tone(1000,0.14,0.22,'triangle',1500);},95);},
+ wolfBite:function(){nz(0.1,900,250,0.28,'bandpass',2.2);tone(140,0.07,0.16,'square');}
 };
 var bossPulseT=0;
 function bossPulse(dt){
@@ -485,6 +489,14 @@ function achIconCanvas(kind){
   g.beginPath();g.arc(9,13,1.6,0,6.28);g.fill();
   g.beginPath();g.arc(25,13,1.6,0,6.28);g.fill();
   g.strokeStyle='#8a6c1a';g.lineWidth=1;g.strokeRect(8.5,23.5,17,3);
+ }else if(kind==='detective'){
+  g.strokeStyle='#d8c9a0';g.lineWidth=2.4;
+  g.beginPath();g.arc(14,14,7,0,6.28);g.stroke();
+  g.beginPath();g.moveTo(19,19);g.lineTo(27,27);g.stroke();
+  g.fillStyle='rgba(216,201,160,0.18)';
+  g.beginPath();g.arc(14,14,5.5,0,6.28);g.fill();
+  g.fillStyle='#3a2c18';
+  g.beginPath();g.moveTo(6,9);g.lineTo(20,4);g.lineTo(22,7);g.lineTo(8,12);g.closePath();g.fill();
  }
  return c;
 }
@@ -497,9 +509,9 @@ function showAchToast(name,desc,icon){
  if(AC)sfx.achieve();
 }
 var noteState={open:false,chars:0,title:'',text:'',closeT:0,speed:70};
-function showNote(t,x,speed){
+function showNote(t,x,speed,extraRead){
  noteState.open=true;noteState.chars=0;noteState.title=t;noteState.text=x;noteState.speed=speed||70;
- noteState.closeT=Math.max(9,x.length/noteState.speed+4.5);
+ noteState.closeT=Math.max(9,x.length/noteState.speed+(extraRead||4.5));
  noteTitleEl.textContent=t;noteTextEl.textContent='';noteEl.style.display='block';
 }
 function hideNote(){noteState.open=false;noteEl.style.display='none';}
@@ -1221,7 +1233,7 @@ function killBear(){
  stopBossMusic();
  clawItem={x:bear.x,y:bear.y,got:false};
  unlockAch('forest_master');
- if(wolfKillCount===0)unlockAch('masha');
+ if(P.hp>=P.hpMax)unlockAch('masha');
  Q='bossDead';
  centerFlash(L('МЕДВЕДЬ-ШАТУН ПОВЕРЖЕН','THE ROGUE BEAR IS DEFEATED'),3.5);
  objectiveEl.textContent=L('Подбери коготь и отнеси его вместе с фигуркой егерю.','Pick up the claw and bring it with the figurine to the ranger.');
@@ -1300,7 +1312,7 @@ function updateWolves(dt){
   collideEnt(w,11);
   w.stepT-=dt;if(w.stepT<=0){w.stepT=0.22;sfx.bearStep(0.16);}
   if(w.hitCD>0)w.hitCD-=dt;
-  if(d<24&&w.hitCD<=0){w.hitCD=1.4;hurtPlayer(0.5,'wolf');}
+  if(d<24&&w.hitCD<=0){w.hitCD=1.4;hurtPlayer(0.5,'wolf');sfx.wolfBite();}
   ns.push(w);
  }
  wolves=ns;
@@ -1347,7 +1359,7 @@ function triggerRangerIntro(){
  showNote(L('ЕГЕРЬ','THE RANGER'),L(
   'Живой... слава богу. Это я вызвал шерифа — слышал крики со стороны просеки несколько ночей подряд.\n\nГде-то в лесу лежит медвежья фигурка — сам толком не знаю, где именно, найдёшь по приметам. В этих местах бродит подранок — медведь-шатун, жрёт всё, что движется. Найди фигурку и разберись с ним, пока он не добрался до людей.\n\nВозьми пару магазинов — тебе пригодится.',
   'Alive... thank God. I\'m the one who called the sheriff — I\'d been hearing screams from the clearing for several nights.\n\nThere\'s a small bear figurine somewhere out there — I couldn\'t tell you exactly where, you\'ll have to look. A wounded rogue bear is roaming those woods, killing everything that moves. Find the figurine and deal with it before it reaches people.\n\nTake a couple of magazines — you\'ll need them.'
- ),56);
+ ),56,14);
  updHUD();
 }
 function killKillerFinal(){
@@ -1412,7 +1424,7 @@ function deliverToRanger(){
  showNote(L('ЕГЕРЬ','THE RANGER'),L(
   'Значит, справился... Спасибо тебе, офицер. Возьми — это старая лесная одежда, крепче твоей формы. Назови её «Лесник».\n\nТеперь можешь сменить костюм в настройках.',
   'So you did it... Thank you, officer. Take this — old forest clothing, tougher than your uniform. Call it the "Ranger" outfit.\n\nYou can change your costume in the settings now.'
- ),56);
+ ),56,14);
 }
 /* ---- tablet: phone dialer + Hero-Cat ---- */
 var tabletOverlayEl=document.getElementById('tabletOverlay'),
@@ -1644,7 +1656,7 @@ function drawSnipeDot(){
  ctx.restore();
 }
 function startCatGame(){
- catState={y:260,vy:0,score:0,alive:true,started:false,walls:[],fish:[],spawnT:0.6,eatT:0,crumbs:[]};
+ catState={y:260,vy:0,score:0,alive:true,started:false,walls:[],fish:[],spawnT:0.6,eatT:0,crumbs:[],missedStreak:0,deathCause:null,newRecord:false};
 }
 function catFlap(){
  var c=catState;if(!c)return;
@@ -1652,11 +1664,18 @@ function catFlap(){
  c.started=true;c.vy=-260;
  sfx.flap();
 }
+function catDied(cause){
+ var c=catState;
+ if(!c||c.deathCause)return;
+ c.alive=false;c.deathCause=cause;
+ if(cause==='hunger')sfx.starve();else sfx.splat();
+ if(c.score>(save.catBest||0)){save.catBest=c.score;writeSave();c.newRecord=true;sfx.catRecord();}
+}
 function updateCat(dt){
  var c=catState;if(!c||!c.started||!c.alive)return;
  c.vy+=820*dt;c.y+=c.vy*dt;
  if(c.y<10){c.y=10;c.vy=0;}
- if(c.y>510){c.alive=false;sfx.splat();return;}
+ if(c.y>510){catDied('fall');return;}
  c.spawnT-=dt;
  if(c.spawnT<=0){
   c.spawnT=1.6;
@@ -1669,17 +1688,23 @@ function updateCat(dt){
   var wl=c.walls[i];wl.x-=140*dt;
   if(wl.x<-40)c.walls.splice(i,1);
   else if(wl.x<62&&wl.x+wl.w>38){
-   if(c.y-12<wl.gapY-wl.gapH/2||c.y+12>wl.gapY+wl.gapH/2){c.alive=false;sfx.splat();}
+   if(c.y-12<wl.gapY-wl.gapH/2||c.y+12>wl.gapY+wl.gapH/2){catDied('wall');}
   }
  }
+ if(!c.alive)return;
  for(i=c.fish.length-1;i>=0;i--){
   var f=c.fish[i];f.x-=140*dt;
-  if(f.x<-20){c.fish.splice(i,1);continue;}
+  if(f.x<-20){
+   c.fish.splice(i,1);
+   c.missedStreak=(c.missedStreak||0)+1;
+   if(c.missedStreak>=3){catDied('hunger');return;}
+   continue;
+  }
   if(Math.hypot(f.x-50,f.y-c.y)<17){
-   c.fish.splice(i,1);c.score++;sfx.fish();
+   c.fish.splice(i,1);c.score++;sfx.fish();c.missedStreak=0;
    c.eatT=0.35;
    for(var ci=0;ci<5;ci++)c.crumbs.push({x:f.x,y:f.y,vx:(Math.random()-0.5)*60,vy:-30-Math.random()*40,t:0.5});
-   if(c.score>=5)unlockAch('potap');
+   if(c.score>=20)unlockAch('potap');
   }
  }
  if(c.eatT>0)c.eatT=Math.max(0,c.eatT-dt);
@@ -1753,11 +1778,15 @@ function drawCat(){
  }
  g.restore();
  g.fillStyle='#cfe6bc';g.font='18px monospace';g.textAlign='center';
- g.fillText(L('ОЧКИ ','SCORE ')+c.score,W2/2,30);
+ g.fillText(L('ОЧКИ ','SCORE ')+c.score,W2/2,26);
+ g.fillStyle='#8fae7a';g.font='11px monospace';
+ g.fillText(L('РЕКОРД ','BEST ')+(save.catBest||0),W2/2,44);
  if(!c.started){g.fillStyle='#9fb08a';g.font='11px monospace';g.fillText(L('НАЖМИ, ЧТОБЫ ЛЕТЕТЬ','TAP TO FLY'),W2/2,H2/2);}
  if(!c.alive&&c.started){
-  g.fillStyle='#ff6a5e';g.font='13px monospace';g.fillText(L('ИГРА ОКОНЧЕНА','GAME OVER'),W2/2,H2/2-6);
-  g.fillStyle='#9fb08a';g.font='10px monospace';g.fillText(L('НАЖМИ, ЧТОБЫ НАЧАТЬ ЗАНОВО','TAP TO RESTART'),W2/2,H2/2+14);
+  var overMsg=c.deathCause==='hunger'?L('КОТ ОСТАЛСЯ ГОЛОДНЫМ','THE CAT WENT HUNGRY'):L('ИГРА ОКОНЧЕНА','GAME OVER');
+  g.fillStyle='#ff6a5e';g.font='13px monospace';g.fillText(overMsg,W2/2,H2/2-20);
+  if(c.newRecord){g.fillStyle='#ffd77a';g.font='12px monospace';g.fillText(L('НОВЫЙ РЕКОРД!','NEW RECORD!'),W2/2,H2/2);}
+  g.fillStyle='#9fb08a';g.font='10px monospace';g.fillText(L('НАЖМИ, ЧТОБЫ НАЧАТЬ ЗАНОВО','TAP TO RESTART'),W2/2,H2/2+18);
  }
  g.textAlign='left';
 }
@@ -1774,6 +1803,7 @@ catCanvasEl.addEventListener('touchstart',function(e){e.preventDefault();if(tabl
 function winGame(){
  mode='win';sfx.engine();stopBossMusic();
  if(rangerFullRun&&P.costume==='ranger')unlockAch('forester_pal');
+ if(P.clues>=10)unlockAch('detective');
  var questLine=save.rangerUnlocked?L('Медведь-шатун побеждён. Егерь подарил тебе новый костюм — «Лесник».','The rogue bear is defeated. The ranger gave you a new outfit — the "Ranger".'):
   (Q==='done'?'':L('Дело ещё не закрыто до конца...','The case isn\'t fully closed yet...'));
  showScreen('<h1 style="color:#9fd08a">'+L('ЭВАКУАЦИЯ','EVACUATION')+'</h1>'+
