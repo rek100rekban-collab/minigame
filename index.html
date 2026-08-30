@@ -636,6 +636,7 @@ function reset(){
  radarActive=false;radarT=0;radarCD=0;radarPingT=0;
  tabletOpen=false;phoneApp='home';snipeArmed=false;snipeT=0;pending47=false;hurtFlashT=0;
  dialState={digits:'',status:'idle',callT:0,num:'',msg:'',msgEn:'',choiceA:null,choiceB:null,ghostCalls:0};
+ save.calls={};
  bossBarEl.style.display='none';runFlashEl.classList.remove('show');achToastEl.classList.remove('show');
  buildWorld();
  objectiveEl.textContent=L('Осмотрись. Ищи улики. Радар (U) укажет на ближайшую улику.','Look around. Search for clues. The radar (U) will point to the nearest clue.');
@@ -1506,7 +1507,7 @@ function genericFail(){
 function resolveCall(){
  var s=dialState,num=s.num;
  s.choiceA=null;s.choiceB=null;
- if(num==='911'){
+ if(num==='911'||num==='112'){
   if(save.calls.n911){genericFail();return;}
   save.calls.n911=true;writeSave();
   s.status='talk';s.talkDur=0;s.callT=0;
