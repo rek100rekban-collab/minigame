@@ -719,7 +719,11 @@ addEventListener('contextmenu',function(e){e.preventDefault();});
   touchMove.x=Math.cos(a)*m;touchMove.y=Math.sin(a)*m;
  },function(){touchMove.active=false;touchMove.x=0;touchMove.y=0;});
  bindStick(joyR,knobR,38,function(nx,ny,m){
-  if(m>0.12){touchAim.active=true;touchAim.angle=Math.atan2(ny,nx);}
+  if(m>0.12){
+   touchAim.active=true;touchAim.angle=Math.atan2(ny,nx);
+   mouse.x=W/2+Math.cos(touchAim.angle)*150;
+   mouse.y=H/2+Math.sin(touchAim.angle)*150;
+  }
  },function(){});
  function btn(id,fn){
   var el=document.getElementById(id);
@@ -1467,7 +1471,7 @@ function renderDialer(){
  }
 }
 function choiceLabel(num,which){
- if(num==='911')return which==='A'?L('Доложить об успехе','Report success'):L('Сбросить','Hang up');
+ if(num==='911'||num==='112')return which==='A'?L('Доложить об успехе','Report success'):L('Сбросить','Hang up');
  if(num==='666666666')return which==='A'?L('Да','Yes'):L('Нет','No');
  if(num==='5555722')return which==='A'?L('Это Красти Краб?','Is this Krusty Krab?'):L('Сбросить','Hang up');
  return '';
@@ -1488,7 +1492,7 @@ function dialCall(){
  if(dialState.status!=='idle'||!dialState.digits)return;
  var num=dialState.digits;
  dialState.num=num;dialState.status='ring';dialState.callT=0;dialState.ringBeepT=0;
- dialState.ringDur=(num==='911')?7:3;
+ dialState.ringDur=(num==='911'||num==='112')?7:3;
  renderDialer();
 }
 var FAIL_MSGS=[
