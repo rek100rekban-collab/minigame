@@ -44,6 +44,17 @@ body.touch.portrait #game,body.touch.portrait .hud,body.touch.portrait #touchUI{
  #tBtnU{right:16px;bottom:184px}
  #tBtnEsc{width:30px;height:30px;font-size:12px}
 }
+@media (max-height:520px){
+ #screen{padding-top:10px}
+ #screen h1{font-size:22px;letter-spacing:5px;margin-bottom:4px}
+ #screen .sub{font-size:10px;letter-spacing:2px;margin-bottom:10px}
+ #screen .box{font-size:11px;line-height:1.45;padding:8px 12px;margin-bottom:12px;max-width:92vw}
+ #screen button{font-size:13px;padding:8px 22px;letter-spacing:2px}
+ #screen .row{margin-bottom:8px}
+ #screen .row button{font-size:11px;padding:6px 14px}
+ #screen .foot{margin-top:8px;font-size:9px}
+ #screen .lbl{margin:8px 0 4px}
+}
 .hud{position:fixed;font-family:'Courier New',monospace;color:#cfd6cf;user-select:none;pointer-events:none;text-shadow:0 0 6px #000,0 2px 2px #000;z-index:5}
 #clueBox{top:18px;left:22px}
 #clueBig{font-size:26px;letter-spacing:3px;color:#e8e3d0}
@@ -60,7 +71,7 @@ body.touch.portrait #game,body.touch.portrait .hud,body.touch.portrait #touchUI{
 #note{left:50%;top:12%;transform:translateX(-50%);width:min(580px,82vw);background:rgba(6,8,6,.92);border:1px solid #3a4a33;padding:14px 18px;display:none;box-shadow:0 0 30px rgba(0,0,0,.85);z-index:6}
 #noteTitle{color:#ffd77a;font-size:15px;letter-spacing:2px;margin-bottom:7px}
 #noteText{color:#cfd6c4;font-size:14px;line-height:1.55;white-space:pre-wrap;min-height:20px}
-#screen{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,#0b100b 0%,#000 78%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;font-family:'Courier New',monospace;color:#cfd6cf;text-align:center}
+#screen{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,#0b100b 0%,#000 78%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:4vh 16px 40px;box-sizing:border-box;z-index:10;font-family:'Courier New',monospace;color:#cfd6cf;text-align:center}
 #screen.hidden{display:none}
 #screen h1{font-size:38px;letter-spacing:9px;color:#e8e3d0;text-shadow:0 0 20px rgba(120,200,120,.22);margin:0 0 8px}
 #screen .sub{color:#8b9b7e;font-size:13px;letter-spacing:4px;margin-bottom:22px}
@@ -99,7 +110,7 @@ button:hover{background:#24351a;box-shadow:0 0 16px rgba(120,200,120,.35)}
 .appicon:active{background:#22331a}
 .aiglyph{font-size:34px}
 #dialDisplay{margin:16px 14px 6px;background:#081006;border:1px solid #24331a;padding:12px;font-size:22px;letter-spacing:2px;color:#d8f0c0;min-height:28px;text-align:center;border-radius:5px}
-#dialStatus{margin:2px 16px;font-size:12.5px;color:#9fb08a;text-align:center;min-height:52px;max-height:280px;overflow-y:auto;line-height:1.45;white-space:pre-wrap;flex:0 0 auto}
+#dialStatus{margin:2px 16px;font-size:12.5px;color:#9fb08a;text-align:center;min-height:52px;max-height:280px;overflow-y:auto;touch-action:pan-y;line-height:1.45;white-space:pre-wrap;flex:0 0 auto}
 #dialChoices{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 12px;margin-bottom:6px}
 #dialChoices .pbtn{font-size:11px;padding:9px 12px;width:auto;height:auto;border-radius:6px}
 #dialPad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 16px;margin-top:auto}
@@ -649,6 +660,7 @@ addEventListener('keyup',function(e){keys[e.code]=false;});
 addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;});
 addEventListener('mousedown',function(e){
  if(tabletOpen)return;
+ if(e.target!==cvs)return;
  if(e.button===0){mouse.l=true;if(mode==='play')firePistol();}
  if(e.button===2){mouse.r=true;if(mode==='play')fireShotgun();}
 });
