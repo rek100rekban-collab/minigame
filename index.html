@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>ПОЗЫВНОЙ «ЛЕС» — v0.2</title>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';document.head.appendChild(s);"></script>
 <style>
 html,body{margin:0;padding:0;background:#000;overflow:hidden;height:100%;touch-action:none;overscroll-behavior:none}
 body{cursor:crosshair;-webkit-user-select:none;user-select:none}
@@ -3605,21 +3605,46 @@ function menuInit(){
 }
 var mpPeer=null,mpConn=null,mpIsHost=false,mpSelectedMap=null,mpOtherName='',mpOtherCostume='patrol',mpRoomCodeRaw='';
 var MP_ROOM_PREFIX='pozles6-';
-var MP_PEER_OPTS={config:{iceServers:[
+var MP_CYRILLIC_HOMOGLYPHS={'А':'A','В':'B','Е':'E','К':'K','М':'M','Н':'H','О':'O','Р':'P','С':'C','Т':'T','У':'Y','Х':'X'};
+function mpNormalizeCode(raw){
+ var s=(raw||'').trim().toUpperCase(),out='';
+ for(var i=0;i<s.length;i++)out+=MP_CYRILLIC_HOMOGLYPHS[s[i]]||s[i];
+ return out.replace(/[^A-Z0-9]/g,'');
+}
+var MP_PEER_OPTS={debug:2,secure:location.protocol==='https:',config:{iceServers:[
  {urls:'stun:stun.l.google.com:19302'},
  {urls:'stun:stun1.l.google.com:19302'},
  {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
  {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
  {urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'}
 ]}};
-var mpConnectTimeoutH=null;
+var mpConnectTimeoutH=null,mpRegTimeoutH=null;
+var MP_REG_TIMEOUT_MS=12000;
 function mpCleanup(){
  clearTimeout(mpConnectTimeoutH);
+ clearTimeout(mpRegTimeoutH);
  if(mpConn){try{mpConn.close();}catch(e){}mpConn=null;}
  if(mpPeer){try{mpPeer.destroy();}catch(e){}mpPeer=null;}
  mpStopBgFallback();
  mpMusicStop();
  mpCheckpoint=null;
+}
+function mpErrDetail(err){
+ if(!err)return '';
+ var parts=[];
+ if(err.type)parts.push('type: '+err.type);
+ if(err.message)parts.push(err.message);
+ if(!parts.length){try{var s=String(err);if(s&&s!=='[object Object]')parts.push(s);}catch(e){}}
+ return parts.join(' — ');
+}
+function mpLibReady(){return typeof Peer!=='undefined';}
+function mpLibMissingMsg(){
+ return L('Библиотека мультиплеера не загрузилась (проблема интернет-соединения или блокировка CDN). Обновите страницу и проверьте подключение к интернету.','The multiplayer library failed to load (an internet connection issue, or a blocked CDN). Refresh the page and check your internet connection.');
+}
+function mpRegFailMsg(){
+ var m=L('Не удалось подключиться к серверу сопряжения. Проверьте интернет-соединение и попробуйте снова.','Could not reach the pairing server. Check your internet connection and try again.');
+ if(location.protocol==='file:')m+=' '+L('Похоже, файл игры открыт напрямую (file://) — это может мешать подключению. Попробуйте разместить его на веб-сервере.','It looks like the game file was opened directly (file://) — this can interfere with connecting. Try hosting it on a web server instead.');
+ return m;
 }
 var mpBgTimer=null,mpBgLast=0;
 function mpStartBgFallback(){
@@ -3657,9 +3682,11 @@ function mpAskName(cb){
 }
 function openMultiplayerMenu(){
  if(!save.playerName){mpAskName(openMultiplayerMenu);return;}
+ var fileWarn=location.protocol==='file:'?('<div class="sub" style="margin-top:8px;color:#ffb84a">'+L('⚠ Игра открыта как локальный файл (file://). Для надёжной работы мультиплеера разместите index.html на веб-сайте/хостинге и открывайте по http(s)-ссылке — иначе сетевые функции браузера могут работать нестабильно.','⚠ The game is open as a local file (file://). For reliable multiplayer, host index.html on a website and open it via an http(s) link — otherwise the browser\'s networking features may behave unreliably.')+'</div>'):'';
  showScreen('<h1 style="letter-spacing:6px">'+L('МУЛЬТИПЛЕЕР','MULTIPLAYER')+'</h1>'+
  '<div class="box">'+L('Кооперативный режим. Один игрок создаёт комнату, второй подключается по коду.','Co-op mode. One player creates a room, the other connects using the code.')+
  '<br><br>'+L('Ваше имя: ','Your name: ')+'<b>'+save.playerName+'</b></div>'+
+ fileWarn+
  '<button data-act="mpcreate">'+L('СОЗДАТЬ КОМНАТУ','CREATE ROOM')+'</button>'+
  '<button data-act="mpjoin" style="margin-top:10px">'+L('ВОЙТИ ПО КОДУ','JOIN BY CODE')+'</button>'+
  '<button data-act="mpname" style="margin-top:10px">'+L('СМЕНИТЬ ИМЯ','CHANGE NAME')+'</button>'+
@@ -3670,7 +3697,7 @@ function openMultiplayerMenu(){
 }
 function mpShowCreateScreen(errMsg){
  showScreen('<h1 style="letter-spacing:6px">'+L('СОЗДАТЬ КОМНАТУ','CREATE ROOM')+'</h1>'+
- '<div class="box">'+L('Придумайте короткий код комнаты (буквы и цифры) и сообщите его напарнику:','Make up a short room code (letters and digits) and tell it to your partner:')+'</div>'+
+ '<div class="box">'+L('Придумайте короткий код комнаты (только латинские буквы и цифры, например ROOM1) и сообщите его напарнику:','Make up a short room code (Latin letters and digits only, e.g. ROOM1) and tell it to your partner:')+'</div>'+
  '<input id="mpRoomCodeInput" type="text" maxlength="8" placeholder="'+L('код комнаты','room code')+'" style="width:min(240px,70vw);padding:10px;font-size:20px;letter-spacing:3px;text-align:center;text-transform:uppercase;background:#0a0a0a;border:1px solid #3a4a33;color:#ffd77a;border-radius:6px">'+
  (errMsg?'<div class="sub" style="margin-top:8px;color:#ff4b3e">'+errMsg+'</div>':'')+
  '<div class="row" style="margin-top:14px">'+
@@ -3678,8 +3705,8 @@ function mpShowCreateScreen(errMsg){
  '<button data-act="back">'+L('НАЗАД','BACK')+'</button>'+
  '</div>',
  {mpcreate2:function(){
-   var code=document.getElementById('mpRoomCodeInput').value.trim().toUpperCase().replace(/[^A-ZА-Я0-9]/gi,'');
-   if(!code){mpShowCreateScreen(L('Введите код комнаты','Enter a room code'));return;}
+   var code=mpNormalizeCode(document.getElementById('mpRoomCodeInput').value);
+   if(!code){mpShowCreateScreen(L('Введите код комнаты (латинские буквы и цифры)','Enter a room code (Latin letters and digits)'));return;}
    mpCreateRoom(code);
   },
   back:function(){openMultiplayerMenu();}}
@@ -3687,14 +3714,17 @@ function mpShowCreateScreen(errMsg){
 }
 function mpCreateRoom(code){
  mpCleanup();
+ if(!mpLibReady()){mpShowMpError(mpLibMissingMsg());return;}
  mpIsHost=true;mpSelectedMap=null;mpRoomCodeRaw=code;
  showScreen('<h1 style="letter-spacing:6px">'+L('СОЗДАНИЕ КОМНАТЫ...','CREATING ROOM...')+'</h1>'+
  '<div class="box">'+L('Подождите...','Please wait...')+'</div>'+
  '<div class="row" style="margin-top:14px"><button data-act="back">'+L('ОТМЕНА','CANCEL')+'</button></div>',
  {back:function(){mpCleanup();openMultiplayerMenu();}}
  );
+ var regDone=false;
  mpPeer=new Peer(MP_ROOM_PREFIX+code.toLowerCase(),MP_PEER_OPTS);
- mpPeer.on('open',function(){mpShowHostLobby();});
+ mpRegTimeoutH=setTimeout(function(){if(!regDone)mpShowMpError(mpRegFailMsg());},MP_REG_TIMEOUT_MS);
+ mpPeer.on('open',function(){regDone=true;clearTimeout(mpRegTimeoutH);mpShowHostLobby();});
  mpPeer.on('connection',function(c){
   mpConn=c;
   clearTimeout(mpConnectTimeoutH);
@@ -3702,12 +3732,13 @@ function mpCreateRoom(code){
    if(mpConn&&!mpConn.open)mpShowMpError(L('Не удалось установить соединение с гостем (проблема сети/NAT). Попросите гостя попробовать снова.','Could not establish a connection to the guest (network/NAT issue). Ask them to try again.'));
   },15000);
   mpConn.on('open',function(){clearTimeout(mpConnectTimeoutH);mpOnHostGuestJoined();});
-  mpConn.on('error',function(err){console.error('mp guest conn error',err);mpShowMpError(L('Ошибка соединения с гостем: ','Connection error with the guest: ')+(err&&(err.type||err.message)||''));});
+  mpConn.on('error',function(err){console.error('mp guest conn error',err);mpShowMpError(L('Ошибка соединения с гостем: ','Connection error with the guest: ')+mpErrDetail(err));});
  });
  mpPeer.on('error',function(err){
+  regDone=true;clearTimeout(mpRegTimeoutH);
   console.error('mp host peer error',err);
   if(err&&err.type==='unavailable-id'){mpCleanup();mpShowCreateScreen(L('Этот код уже занят, придумайте другой','That code is taken, try another one'));return;}
-  mpShowMpError((err&&(err.type||err.message))||'');
+  mpShowMpError(mpErrDetail(err)||mpRegFailMsg());
  });
 }
 function mpShowMpError(detail){
@@ -3759,14 +3790,14 @@ function mpHostStartGame(){
 }
 function mpShowJoinScreen(){
  showScreen('<h1 style="letter-spacing:6px">'+L('ВОЙТИ ПО КОДУ','JOIN BY CODE')+'</h1>'+
- '<div class="box">'+L('Введите код комнаты, который вам продиктовал хост:','Enter the room code the host gave you:')+'</div>'+
+ '<div class="box">'+L('Введите код комнаты, который вам продиктовал хост (латинскими буквами):','Enter the room code the host gave you (Latin letters):')+'</div>'+
  '<input id="mpCodeInput" type="text" maxlength="8" placeholder="'+L('код комнаты','room code')+'" style="width:min(240px,70vw);padding:10px;font-size:20px;letter-spacing:3px;text-align:center;text-transform:uppercase;background:#0a0a0a;border:1px solid #3a4a33;color:#cfd6cf;border-radius:6px">'+
  '<div class="row" style="margin-top:14px">'+
  '<button data-act="mpconnect">'+L('ПОДКЛЮЧИТЬСЯ','CONNECT')+'</button>'+
  '<button data-act="back">'+L('НАЗАД','BACK')+'</button>'+
  '</div>',
  {mpconnect:function(){
-   var code=document.getElementById('mpCodeInput').value.trim().toUpperCase().replace(/[^A-ZА-Я0-9]/gi,'');
+   var code=mpNormalizeCode(document.getElementById('mpCodeInput').value);
    if(code)mpJoinRoom(code);
   },
   back:function(){openMultiplayerMenu();}}
@@ -3774,27 +3805,32 @@ function mpShowJoinScreen(){
 }
 function mpJoinRoom(roomCode){
  mpCleanup();
+ if(!mpLibReady()){mpShowJoinError(mpLibMissingMsg());return;}
  mpIsHost=false;
  showScreen('<h1 style="letter-spacing:6px">'+L('ПОДКЛЮЧЕНИЕ...','CONNECTING...')+'</h1>'+
  '<div class="box">'+L('Подождите...','Please wait...')+'</div>'+
  '<div class="row" style="margin-top:14px"><button data-act="back">'+L('ОТМЕНА','CANCEL')+'</button></div>',
  {back:function(){mpCleanup();openMultiplayerMenu();}}
  );
+ var regDone=false;
  mpPeer=new Peer(MP_PEER_OPTS);
+ mpRegTimeoutH=setTimeout(function(){if(!regDone)mpShowJoinError(mpRegFailMsg());},MP_REG_TIMEOUT_MS);
  mpPeer.on('open',function(){
+  regDone=true;clearTimeout(mpRegTimeoutH);
   mpConn=mpPeer.connect(MP_ROOM_PREFIX+roomCode.toLowerCase(),{reliable:true});
   clearTimeout(mpConnectTimeoutH);
   mpConnectTimeoutH=setTimeout(function(){
    if(mpConn&&!mpConn.open)mpShowJoinError(L('Не удалось установить соединение (проблема сети/NAT). Убедитесь, что у хоста стабильный интернет, и попробуйте снова.','Could not establish a connection (network/NAT issue). Make sure the host has a stable internet connection and try again.'));
   },15000);
   mpConn.on('open',function(){clearTimeout(mpConnectTimeoutH);mpOnGuestConnected();});
-  mpConn.on('error',function(err){console.error('mp guest conn error',err);mpShowJoinError(L('Ошибка соединения: ','Connection error: ')+(err&&(err.type||err.message)||''));});
+  mpConn.on('error',function(err){console.error('mp guest conn error',err);mpShowJoinError(L('Ошибка соединения: ','Connection error: ')+mpErrDetail(err));});
  });
  mpPeer.on('error',function(err){
+  regDone=true;clearTimeout(mpRegTimeoutH);
   console.error('mp guest peer error',err);
   clearTimeout(mpConnectTimeoutH);
   if(err&&err.type==='peer-unavailable'){mpShowJoinError(L('Комната с таким кодом не найдена. Проверьте код и убедитесь, что хост уже создал комнату.','No room found with that code. Check the code and make sure the host has already created the room.'));return;}
-  mpShowJoinError((err&&(err.type||err.message))||'');
+  mpShowJoinError(mpErrDetail(err)||mpRegFailMsg());
  });
 }
 function mpShowJoinError(detail){
