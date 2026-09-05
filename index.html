@@ -3614,12 +3614,15 @@ function mpNormalizeCode(raw){
 var MP_PEER_OPTS={debug:2,secure:location.protocol==='https:',config:{iceServers:[
  {urls:'stun:stun.l.google.com:19302'},
  {urls:'stun:stun1.l.google.com:19302'},
+ {urls:'stun:openrelay.metered.ca:80'},
  {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
  {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
- {urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'}
-]}};
+ {urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'},
+ {urls:'turns:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
+ {urls:'turns:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'}
+],iceCandidatePoolSize:4}};
 var mpConnectTimeoutH=null,mpRegTimeoutH=null;
-var MP_REG_TIMEOUT_MS=12000;
+var MP_REG_TIMEOUT_MS=12000,MP_CONNECT_TIMEOUT_MS=25000;
 function mpCleanup(){
  clearTimeout(mpConnectTimeoutH);
  clearTimeout(mpRegTimeoutH);
@@ -3730,7 +3733,7 @@ function mpCreateRoom(code){
   clearTimeout(mpConnectTimeoutH);
   mpConnectTimeoutH=setTimeout(function(){
    if(mpConn&&!mpConn.open)mpShowMpError(L('Не удалось установить соединение с гостем (проблема сети/NAT). Попросите гостя попробовать снова.','Could not establish a connection to the guest (network/NAT issue). Ask them to try again.'));
-  },15000);
+  },MP_CONNECT_TIMEOUT_MS);
   mpConn.on('open',function(){clearTimeout(mpConnectTimeoutH);mpOnHostGuestJoined();});
   mpConn.on('error',function(err){console.error('mp guest conn error',err);mpShowMpError(L('Ошибка соединения с гостем: ','Connection error with the guest: ')+mpErrDetail(err));});
  });
@@ -3821,7 +3824,7 @@ function mpJoinRoom(roomCode){
   clearTimeout(mpConnectTimeoutH);
   mpConnectTimeoutH=setTimeout(function(){
    if(mpConn&&!mpConn.open)mpShowJoinError(L('Не удалось установить соединение (проблема сети/NAT). Убедитесь, что у хоста стабильный интернет, и попробуйте снова.','Could not establish a connection (network/NAT issue). Make sure the host has a stable internet connection and try again.'));
-  },15000);
+  },MP_CONNECT_TIMEOUT_MS);
   mpConn.on('open',function(){clearTimeout(mpConnectTimeoutH);mpOnGuestConnected();});
   mpConn.on('error',function(err){console.error('mp guest conn error',err);mpShowJoinError(L('Ошибка соединения: ','Connection error: ')+mpErrDetail(err));});
  });
