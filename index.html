@@ -326,7 +326,7 @@ var ACH_LIST=[
  {id:'c4_sergeant',icon:'c4_hat2',ru:'Сержант',en:'Sergeant',dru:'Получите 4 звезды за миссию «Город»',den:'Get 4 stars in the "City" mission'},
  {id:'c4_lucky',icon:'c4_luck',ru:'Везунчик',en:'Lucky One',dru:'Получите скины «Фокусник» и «Джокер» в казино',den:'Get the "Magician" and "Joker" skins from the casino'},
  {id:'c4_jackpot',icon:'c4_jackpot',ru:'Джекпот',en:'Jackpot',dru:'В игре «Красное, Чёрное, Серое» выбейте серую зону',den:'Hit the grey zone in "Red, Black, Grey"'},
- {id:'c4_johnny_depp',icon:'c4_skull',ru:'Джонни Депп',en:'Johnny Depp',dru:'Получите скин «Пират» в казино',den:'Get the "Pirate" skin from the casino'},
+ {id:'c4_johnny_depp',icon:'c4_skull',ru:'Джонни Додеп',en:'Johnny Dodepp',dru:'Получите скин «Пират» в казино',den:'Get the "Pirate" skin from the casino'},
  {id:'c4_radical_measures',icon:'c4_fist',ru:'Радикальные меры',en:'Radical Measures',dru:'Уничтожьте гранатами в сумме 5 бандитов за миссию «Город»',den:'Kill a total of 5 bandits with grenades in the "City" mission'},
  {id:'c4_rambo',icon:'c4_jungle',ru:'Рэмбо',en:'Rambo',dru:'Устраните 20 врагов из пулемёта за миссию «Город»',den:'Eliminate 20 enemies with the machine gun in the "City" mission'},
  {id:'c4_arsenal',icon:'c4_guns',ru:'Полный арсенал',en:'Full Arsenal',dru:'Приобретите дробовик, пулемёт и миниган за один патруль',den:'Acquire the shotgun, machine gun, and SMG in a single patrol'},
@@ -339,11 +339,12 @@ var ACH_LIST=[
  {id:'c4_savior',icon:'c4_shield',ru:'Спаситель в форме',en:'Savior in Uniform',dru:'Спасите 3 полицейских, которым нужна была помощь, за один патруль',den:'Rescue 3 officers who needed assistance in a single patrol'},
  {id:'c4_inspector',icon:'c4_wand',ru:'Инспектор',en:'The Inspector',dru:'Получите все остальные достижения миссии «Город»',den:'Earn every other achievement in the "City" mission'}
 ];
+var ACH_GRAND_IDS={boss_of_bosses:1,sensei_path:1,back_to_future:1,lightning_investigation:1,c4_inspector:1,fashionista:1};
 function unlockAch(id){
  if(save.ach[id])return;
  save.ach[id]=true;writeSave();
  var a=ACH_LIST.filter(function(x){return x.id===id;})[0];
- if(a)showAchToast(L(a.ru,a.en),L(a.dru,a.den),a.icon);
+ if(a)showAchToast(L(a.ru,a.en),L(a.dru,a.den),a.icon,!!ACH_GRAND_IDS[id]);
  var hardIds={local_ranger:1,snow_white:1,exhibit_fan:1,die_hard:1};
  var allDone=ACH_LIST.every(function(x){return x.id==='boss_of_bosses'||hardIds[x.id]||save.ach[x.id];});
  if(allDone)unlockAch('boss_of_bosses');
@@ -654,7 +655,27 @@ var sfx={
  huntDash:function(){nz(0.14,2200,500,0.3,'bandpass',2);tone(180,0.1,0.2,'sawtooth',80);},
  carDoor:function(){nz(0.1,700,250,0.22,'bandpass',2);tone(160,0.08,0.16,'square');},
  carCrash:function(){nz(0.3,2500,300,0.6,'lowpass',1.4);tone(90,0.25,0.35,'sawtooth',40);},
- tireScreech:function(){nz(0.35,3200,1300,0.32,'bandpass',3);}
+ tireScreech:function(){nz(0.35,3200,1300,0.32,'bandpass',3);},
+ rouletteLose:function(){tone(280,0.14,0.14,'sine',160);},
+ wheelLose:function(){tone(260,0.14,0.16,'sawtooth',140);nz(0.08,500,200,0.1);},
+ dupSkinRefund:function(){tone(700,0.08,0.18,'triangle',500);setTimeout(function(){if(AC)tone(500,0.1,0.16,'triangle',350);},90);},
+ ratingDown:function(){tone(500,0.12,0.14,'square',350);setTimeout(function(){if(AC)tone(350,0.14,0.14,'square',220);},110);},
+ c4SirenOn:function(){tone(500,0.3,0.2,'sawtooth',1000);},
+ c4SirenOff:function(){tone(900,0.15,0.16,'sawtooth',300);},
+ c4LightsOn:function(){tone(1400,0.03,0.12,'square');setTimeout(function(){if(AC)tone(1800,0.03,0.1,'square');},50);},
+ c4LightsOff:function(){tone(1800,0.03,0.1,'square');setTimeout(function(){if(AC)tone(1200,0.03,0.08,'square');},50);},
+ c4ShopBell:function(){tone(1046,0.1,0.16,'triangle',1568);setTimeout(function(){if(AC)tone(1568,0.14,0.18,'triangle',2093);},100);},
+ c4TuningBell:function(){nz(0.08,900,300,0.16,'bandpass',2);tone(400,0.08,0.14,'square');},
+ c4CasinoDoor:function(){tone(600,0.06,0.16,'triangle',900);setTimeout(function(){if(AC)tone(900,0.08,0.18,'triangle',1300);},80);},
+ brWeaponEquip:function(){tone(200,0.04,0.16,'square',500);nz(0.03,1000,400,0.12);},
+ brMenuOpen:function(){tone(700,0.05,0.12,'sine',1000);},
+ mpWaveIncoming:function(){tone(220,0.4,0.16,'sawtooth',440);nz(0.3,600,200,0.08);},
+ achMetaUnlock:function(){[523,659,784,1046,1318].forEach(function(f,i){setTimeout(function(){if(AC)tone(f,0.22,0.26,'triangle',f*1.5);},i*110);});},
+ brCheckpointSave:function(){tone(800,0.06,0.14,'sine',1200);setTimeout(function(){if(AC)tone(1200,0.1,0.16,'sine',1600);},90);},
+ c4EventCritical:function(){for(var i=0;i<3;i++)(function(i){setTimeout(function(){if(AC)tone(1200,0.05,0.18,'square');},i*90);})(i);},
+ c4WheelJackpot:function(){[440,554,659,880,1046,1318].forEach(function(f,i){setTimeout(function(){if(AC)tone(f,0.2,0.26,'triangle');},i*90);});},
+ mpRespawnBack:function(){tone(400,0.1,0.16,'sine',700);setTimeout(function(){if(AC)tone(650,0.16,0.2,'triangle',900);},110);},
+ c4NotEnoughCoins:function(){tone(220,0.12,0.18,'square',150);nz(0.06,400,150,0.12);}
 };
 var bossPulseT=0;
 function bossPulse(dt){
@@ -1286,12 +1307,12 @@ function achIconCanvas(kind){
  return c;
 }
 var achToastT=0;
-function showAchToast(name,desc,icon){
+function showAchToast(name,desc,icon,grand){
  achKickerEl.textContent=L('ДОСТИЖЕНИЕ','ACHIEVEMENT');
  achNameEl.textContent=name;achDescEl.textContent=desc;
  achIconEl.innerHTML='';achIconEl.appendChild(achIconCanvas(icon||'claw'));
  achToastEl.classList.add('show');achToastT=4.5;
- if(AC)sfx.achieve();
+ if(AC){if(grand)sfx.achMetaUnlock();else sfx.achieve();}
 }
 var noteState={open:false,chars:0,title:'',text:'',closeT:0,speed:70};
 function showNote(t,x,speed,extraRead){
@@ -1573,8 +1594,8 @@ addEventListener('keydown',function(e){
     var wl0=brUnlockedWeapons();
     var li0=wl0.findIndex(function(w){return w.id===(P.rightWeapon||'plasma');});
     brWeaponMenuIdx=li0>=0?li0:0;
-   }
-   sfx.uiTap();
+    sfx.brMenuOpen();
+   }else sfx.uiTap();
   }
   if(e.code==='KeyT'&&P.svEnergyDrinks>0&&!e.repeat){
    P.svEnergyDrinks--;P.energyT=20;sfx.pickup();centerFlash(L('ЭНЕРГЕТИК! БЕСКОНЕЧНАЯ ВЫНОСЛИВОСТЬ 20с','ENERGY DRINK! UNLIMITED STAMINA 20s'),2);
@@ -3480,13 +3501,13 @@ function menuHTML4(){
  '<b>WASD</b> — движение (пешком или за рулём) · <b>SHIFT</b> — бег · <b>E</b> — сесть/выйти из машины<br>'+
  '<b>L</b> — мигалки · <b>H</b> — сирена (только за рулём)<br>'+
  '<b>ЛКМ</b> — пистолет · <b>ПКМ / Q</b> — дробовик · <b>G</b> — граната · <b>R</b> — перезарядка<br><br>'+
- 'Это первая, транспортная часть режима — учись водить машину и осваивай город. Вызовы, погони, магазины и казино появятся в следующих обновлениях.'
+ 'В городе тебя ждут вызовы — банды и ограбления, полицейские, которым нужна помощь, оружейный магазин с апгрейдами и казино с рулеткой.'
  ,
  'You have been assigned to patrol the city in a police cruiser. A huge living city awaits: residential blocks, skyscrapers, shops, a gun shop.<br><br>'+
  '<b>WASD</b> — move (on foot or driving) · <b>SHIFT</b> — sprint · <b>E</b> — get in/out of the car<br>'+
  '<b>L</b> — lights · <b>H</b> — siren (car only)<br>'+
  '<b>LMB</b> — pistol · <b>RMB / Q</b> — shotgun · <b>G</b> — grenade · <b>R</b> — reload<br><br>'+
- 'This is the first, driving-focused part of the mode — learn the car and the city. Calls, chases, shops and the casino are coming in later updates.'
+ 'The city has calls waiting for you — gangs and robberies, officers who need backup, a gun shop with upgrades, and a casino with roulette.'
  )+'</div>'+
  '<button data-act="go4" style="margin-top:12px">'+L('НАЧАТЬ ПАТРУЛЬ 4','START PATROL 4')+'</button>'+
  '<div class="row" style="margin-top:14px">'+
@@ -4197,6 +4218,7 @@ function mpRespawn(pl){
  var ang=Math.random()*TAU;
  pl.x=MP_CX+Math.cos(ang)*80;pl.y=MP_CY+Math.sin(ang)*80;
  mpClampArena(pl,14);
+ sfx.mpRespawnBack();
 }
 function mpMobileZoomMul(){
  var REF=1280;
@@ -4260,6 +4282,13 @@ function mpApplySnapshot(data){
  if(data.runOver&&!mpRunOver){mpRunOver=true;mpRunWon=data.runWon;mpShowEndScreen(mpRunWon?null:L('Команда проиграла','Your team lost'));}
 }
 var mpSnapSeq=0,mpLastAppliedSnapSeq=-1,mpInpSeq=0,mpLastAppliedInpSeq=-1;
+var mpSnapAccum=0,MP_SNAP_INTERVAL=1/20;
+function mpMaybeSendSnapshot(dt){
+ mpSnapAccum+=dt;
+ if(mpSnapAccum<MP_SNAP_INTERVAL)return;
+ mpSnapAccum=0;
+ mpSendSnapshot();
+}
 function mpSendSnapshot(){
  if(!mpConn||!mpConn.open)return;
  mpSnapSeq++;
@@ -4277,7 +4306,7 @@ function updateMpCoop(dt){
  var localInp=mpLocalInput();
  mpCheckLocalFeedback(localInp,dt);
  if(mpIsHost){
-  if(mode==='paused'){mpSendSnapshot();return;}
+  if(mode==='paused'){mpMaybeSendSnapshot(dt);return;}
   mpMovePlayer(mpMe,localInp,dt);
   mpMovePlayer(mpOther,mpRemoteInput,dt);
   mpUpdateBullets(dt);
@@ -4289,7 +4318,7 @@ function updateMpCoop(dt){
   mpUpdateBosses(dt);
   mpUpdateLoot(dt);
   mpResolveCollisions();
-  mpSendSnapshot();
+  mpMaybeSendSnapshot(dt);
  }else{
   mpMe.a=localInp.aim;
   mpSmoothEntities(dt);
@@ -4299,7 +4328,10 @@ function updateMpCoop(dt){
  mpUpdateCamera(dt);
  mpUpdHUD();
 }
+var mpLastNotifiedWaveState=null;
 function mpUpdHUD(){
+ if(mpWaveState==='intro'&&mpLastNotifiedWaveState!=='intro')sfx.mpWaveIncoming();
+ mpLastNotifiedWaveState=mpWaveState;
  clueBigEl.style.fontSize='';clueBigEl.style.maxWidth='';clueBigEl.style.lineHeight='';clueBoxEl.style.top='';
  clueBigEl.textContent=L('КОЛИЗЕЙ','THE COLOSSEUM');
  var line=L('Пистолет: ','Pistol: ')+(mpMe.ammo||0)+' | '+L('Магазины: ','Mags: ')+(mpMe.mags||0);
@@ -11380,7 +11412,7 @@ function brEnter(){
  brBullets=[];brLoot=[];brSparks=[];brBlasts=[];brZones=[];brFlyingGrenade=null;brFlyingChemGrenades=[];brFlyingNet=null;brFlyingPlasma=null;brEnemyBullets=[];brTraps=[];brSkeletons=[];brRockets=[];brFireZones=[];brGrowths=[];brVines=[];brPoisonZones=[];brSafeZones=[];brWolves=[];brMutants=[];brDrone=null;brGenerators=[];brBodyParts=[];brZombies=[];brGraves=[];brDjWaves=[];brNotes=[];brBears=[];brHedgehogs=[];brBoars=[];brRangerTraps=[];brTripwires=[];brRangerHistory=[];
  brNextId=1;brLootDropT=25;brBoss=null;
  brTouchTarget.active=false;
- brStats={kills:0,started:gTime,plasmaShots:0,bulletsFired:0,medkitsUsed:0};
+ brStats={kills:0,started:gTime,plasmaShots:0,bulletsFired:0,medkitsUsed:0,droneBossDmg:0};
  cam.x=P.x;cam.y=P.y;cam.zoom=0.62;
  mpBuildSpectators();
  var isFirstRun=!brCheckpoint;
@@ -11535,6 +11567,7 @@ function brOnBossDefeated(boss){
  brOnBossKilledAchievements(boss.kind);
  brBossIdx++;
  brCheckpoint={bossIdx:brBossIdx,inv:brSnapshotInv(P),loot:JSON.parse(JSON.stringify(brLoot))};
+ setTimeout(function(){if(AC)sfx.brCheckpointSave();},900);
  if(brBossIdx>(save.bossRushBest||0)){save.bossRushBest=brBossIdx;writeSave();}
  brUpdHUD();
 }
@@ -12424,10 +12457,10 @@ function brWeaponMenuClick(mx,my){
  if(Math.hypot(mx-lay.leftArrow.x,my-lay.leftArrow.y)<28){brWeaponMenuIdx=(brWeaponMenuIdx-1+weapons.length)%weapons.length;sfx.uiTap();return;}
  if(Math.hypot(mx-lay.rightArrow.x,my-lay.rightArrow.y)<28){brWeaponMenuIdx=(brWeaponMenuIdx+1)%weapons.length;sfx.uiTap();return;}
  if(mx>=lay.lmbBtn.x&&mx<=lay.lmbBtn.x+lay.lmbBtn.w&&my>=lay.lmbBtn.y&&my<=lay.lmbBtn.y+lay.lmbBtn.h){
-  P.leftWeapon=weapons[brWeaponMenuIdx].id;sfx.pickup();brUpdHUD();return;
+  P.leftWeapon=weapons[brWeaponMenuIdx].id;sfx.brWeaponEquip();brUpdHUD();return;
  }
  if(mx>=lay.rmbBtn.x&&mx<=lay.rmbBtn.x+lay.rmbBtn.w&&my>=lay.rmbBtn.y&&my<=lay.rmbBtn.y+lay.rmbBtn.h){
-  P.rightWeapon=weapons[brWeaponMenuIdx].id;sfx.pickup();brUpdHUD();return;
+  P.rightWeapon=weapons[brWeaponMenuIdx].id;sfx.brWeaponEquip();brUpdHUD();return;
  }
  var wpn2=weapons[brWeaponMenuIdx];
  if(wpn2&&wpn2.id==='pistol'&&P.mgUnlocked){
@@ -13848,7 +13881,11 @@ function brDroneExplode(gx,gy){
  sfx.explosion();camShake=Math.max(camShake,0.7);
  for(var i=0;i<18;i++){var a=Math.random()*TAU,sp=60+Math.random()*200;brSparks.push({x:gx,y:gy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,t:0.5,c:i%2?'#8ac0ff':'#e0f0ff'});}
  var R=70,dmg=40*brDmgMul();
- if(brBoss&&brBoss.active&&Math.hypot(brBoss.x-gx,brBoss.y-gy)<R+(brBoss.hitR||30))brDamageBoss(brBoss,dmg,'drone');
+ if(brBoss&&brBoss.active&&Math.hypot(brBoss.x-gx,brBoss.y-gy)<R+(brBoss.hitR||30)){
+  brDamageBoss(brBoss,dmg,'drone');
+  brStats.droneBossDmg=(brStats.droneBossDmg||0)+dmg;
+  if(brStats.droneBossDmg>=800)unlockAch('br_modernwarfare');
+ }
  for(var ki=0;ki<brSkeletons.length;ki++){var sk=brSkeletons[ki];if(sk.active&&Math.hypot(sk.x-gx,sk.y-gy)<R)brDamageSkeleton(sk,dmg,gx,gy);}
  for(var wi=0;wi<brWolves.length;wi++){var w=brWolves[wi];if(w.active&&Math.hypot(w.x-gx,w.y-gy)<R)brDamageWolf(w,dmg,gx,gy);}
  for(var mi=0;mi<brMutants.length;mi++){var m=brMutants[mi];if(m.active&&Math.hypot(m.x-gx,m.y-gy)<R)brDamageMutant(m,dmg,gx,gy);}
@@ -16017,7 +16054,7 @@ function reset4(){
  c4Bullets=[];c4Sparks=[];c4FlyingGrenade=null;c4CoinPopups=[];c4EnemyBullets=[];
  c4InCar=false;c4MapOpen=false;
  c4Events=[];c4EventSeq=1;c4EventSpawnCD=10;
- c4Stats={started:gTime,completed:0,failed:0,civHits:0,arrests:0,driveTime:0,carEverDestroyed:false,mgKills:0,grenadeKills:0,batonKills:0,gangWins:0,hostileDestroyed:0,officersRescued:0};
+ c4Stats={started:gTime,completed:0,failed:0,civHits:0,arrests:0,driveTime:0,carEverDestroyed:false,mgKills:0,grenadeKills:0,batonKills:0,gangWins:0,hostileDestroyed:0,officersRescued:0,casinoIdleT:0,casinoIdleTicksNotified:0};
  P={x:CITY_STATION.x,y:CITY_STATION.y+150,a:-Math.PI/2,stam:100,exh:false,crouch:false,sprint:false,flash:false,
     ammo:DIFF().magSize,mags:5,hasShotgun:false,sg:0,sgcd:0,cd:0,
     hp:7,hpMax:7,speedBoostT:0,grenades:0,dmgMulT:0,stunT:0,
@@ -16069,7 +16106,7 @@ function c4TryInteract(){
   updHUD4();
  }
 }
-function c4ToggleSiren(){if(!c4InCar)return;cityCar.siren=!cityCar.siren;sfx.uiTap();updHUD4();}
+function c4ToggleSiren(){if(!c4InCar)return;cityCar.siren=!cityCar.siren;if(cityCar.siren)sfx.c4SirenOn();else sfx.c4SirenOff();updHUD4();}
 var c4MapOpen=false;
 function c4ToggleMap(){c4MapOpen=!c4MapOpen;if(c4MapOpen)sfx.c4MapOpen();else sfx.c4MapClose();}
 var c4ShopOpen=false;
@@ -16119,11 +16156,11 @@ function c4GunshopHTML(){
  html+=c4ShopRow(L('Граната','Grenade'),L('15 монет','15 coins'),'buy_grenade',false,undefined,15);
  html+=c4ShopRow(L('Дубинка (разблокировать)','Baton (unlock)'),L('30 монет','30 coins'),'buy_baton',P.batonUnlocked,L('куплена','owned'),30);
  html+=c4ShopRow(L('Дробовик (разблокировать)','Shotgun (unlock)'),L('35 монет','35 coins'),'buy_shotgun',P.hasShotgun,L('куплен','owned'),35);
- html+=c4ShopRow(L('Патроны для дробовика (10 шт.)','Shotgun ammo (10 shells)'),L('18 монет','18 coins'),'buy_shotgunammo',false,undefined,18);
+ html+=c4ShopRow(L('Патроны для дробовика (10 шт.)','Shotgun ammo (10 shells)'),L('10 монет','10 coins'),'buy_shotgunammo',false,undefined,10);
  html+=c4ShopRow(L('Пулемёт из «Боя с боссами» (разблокировать)','Boss Rush machine gun (unlock)'),L('40 монет','40 coins'),'buy_mg',P.mgUnlocked,L('куплен','owned'),40);
- html+=c4ShopRow(L('Магазин для пулемёта (50 патронов)','Machine gun magazine (50 rounds)'),L('20 монет','20 coins'),'buy_mgammo',false,undefined,20);
+ html+=c4ShopRow(L('Магазин для пулемёта (50 патронов)','Machine gun magazine (50 rounds)'),L('12 монет','12 coins'),'buy_mgammo',false,undefined,12);
  html+=c4ShopRow(L('Миниган / SMG (разблокировать)','SMG (unlock)'),L('45 монет','45 coins'),'buy_smg',P.smgUnlocked,L('куплен','owned'),45);
- html+=c4ShopRow(L('Магазин для минигана (80 патронов)','SMG magazine (80 rounds)'),L('25 монет','25 coins'),'buy_smgammo',false,undefined,25);
+ html+=c4ShopRow(L('Магазин для минигана (80 патронов)','SMG magazine (80 rounds)'),L('15 монет','15 coins'),'buy_smgammo',false,undefined,15);
  html+=c4ShopRow(L('Плазменная пушка (разблокировать)','Plasma cannon (unlock)'),L('60 монет','60 coins'),'buy_plasma',P.plasmaUnlocked,L('куплена','owned'),60);
  html+=c4ShopRow(L('Дрон-беспилотник (разблокировать)','Homing drone (unlock)'),L('70 монет','70 coins'),'buy_drone',P.droneUnlocked,L('куплен','owned'),70);
  html+='</div>';
@@ -16149,14 +16186,14 @@ function c4BuyItem(kind){
  else if(kind==='grenade'){cost=15;if(c>=cost){P.grenades=(P.grenades||0)+1;ok=true;msg=L('+1 ГРАНАТА','+1 GRENADE');}}
  else if(kind==='baton'){cost=30;if(c>=cost){P.batonUnlocked=true;P.rightWeapon='baton';ok=true;msg=L('ДУБИНКА КУПЛЕНА','BATON PURCHASED');}}
  else if(kind==='shotgun'){cost=35;if(c>=cost){P.hasShotgun=true;P.sg=(P.sg||0)+10;ok=true;msg=L('ДРОБОВИК КУПЛЕН','SHOTGUN PURCHASED');}}
- else if(kind==='shotgunammo'){cost=18;if(c>=cost){P.sg=(P.sg||0)+10;ok=true;msg=L('+10 ПАТРОНОВ ДРОБОВИКА','+10 SHOTGUN SHELLS');}}
+ else if(kind==='shotgunammo'){cost=10;if(c>=cost){P.sg=(P.sg||0)+10;ok=true;msg=L('+10 ПАТРОНОВ ДРОБОВИКА','+10 SHOTGUN SHELLS');}}
  else if(kind==='mg'){cost=40;if(c>=cost){P.mgUnlocked=true;P.mgAmmo=50;P.rightWeapon='mg';ok=true;msg=L('ПУЛЕМЁТ КУПЛЕН','MACHINE GUN PURCHASED');}}
- else if(kind==='mgammo'){cost=20;if(c>=cost){P.mgMags=(P.mgMags||0)+1;ok=true;msg=L('+1 МАГАЗИН ПУЛЕМЁТА','+1 MACHINE GUN MAGAZINE');}}
+ else if(kind==='mgammo'){cost=12;if(c>=cost){P.mgMags=(P.mgMags||0)+1;ok=true;msg=L('+1 МАГАЗИН ПУЛЕМЁТА','+1 MACHINE GUN MAGAZINE');}}
  else if(kind==='smg'){cost=45;if(c>=cost){P.smgUnlocked=true;P.smgAmmo=80;P.rightWeapon='smg';ok=true;msg=L('МИНИГАН КУПЛЕН','SMG PURCHASED');}}
- else if(kind==='smgammo'){cost=25;if(c>=cost){P.smgMags=(P.smgMags||0)+1;ok=true;msg=L('+1 МАГАЗИН МИНИГАНА','+1 SMG MAGAZINE');}}
+ else if(kind==='smgammo'){cost=15;if(c>=cost){P.smgMags=(P.smgMags||0)+1;ok=true;msg=L('+1 МАГАЗИН МИНИГАНА','+1 SMG MAGAZINE');}}
  else if(kind==='plasma'){cost=60;if(c>=cost){P.plasmaUnlocked=true;P.plasmaCD=0;P.rightWeapon='plasma';ok=true;msg=L('ПЛАЗМЕННАЯ ПУШКА КУПЛЕНА','PLASMA CANNON PURCHASED');}}
  else if(kind==='drone'){cost=70;if(c>=cost){P.droneUnlocked=true;P.droneCD=0;P.rightWeapon='drone';ok=true;msg=L('ДРОН КУПЛЕН','DRONE PURCHASED');}}
- if(!ok){sfx.click();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
+ if(!ok){sfx.c4NotEnoughCoins();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
  save.coins=c-cost;writeSave();
  var isUnlockKind=(kind==='baton'||kind==='shotgun'||kind==='mg'||kind==='smg'||kind==='plasma'||kind==='drone');
  if(isUnlockKind)sfx.c4WeaponUnlock();else sfx.pickup();
@@ -16186,7 +16223,7 @@ var c4GunshopActions={
 };
 function c4OpenGunshop(){
  c4ShopOpen=true;
- sfx.uiTap();
+ sfx.c4ShopBell();
  showScreen(c4GunshopHTML(),c4GunshopActions);
 }
 function c4TuningUpgRow(key,label,level){
@@ -16246,7 +16283,7 @@ function c4RepairCar(){
  if(car.hp>=car.hpMax){sfx.click();return;}
  var cost=Math.ceil((car.hpMax-car.hp)/car.hpMax*40);
  var c=save.coins||0;
- if(c<cost){sfx.click();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
+ if(c<cost){sfx.c4NotEnoughCoins();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
  save.coins=c-cost;writeSave();
  car.hp=car.hpMax;
  sfx.c4Repair();
@@ -16259,7 +16296,7 @@ function c4BuyUpgrade(key){
  if(level>=3)return;
  var cost=costs[level];
  var c=save.coins||0;
- if(c<cost){sfx.click();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
+ if(c<cost){sfx.c4NotEnoughCoins();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
  save.coins=c-cost;writeSave();
  car.upg[key]=level+1;
  sfx.c4Upgrade();
@@ -16270,7 +16307,7 @@ function c4BuyArmor(){
  var car=cityCar;
  if(car.armorPlating){sfx.click();return;}
  var cost=60,c=save.coins||0;
- if(c<cost){sfx.click();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
+ if(c<cost){sfx.c4NotEnoughCoins();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
  save.coins=c-cost;writeSave();
  car.armorPlating=true;
  sfx.c4ArmorInstall();
@@ -16286,10 +16323,10 @@ var c4TuningActions={
 };
 function c4OpenTuning(){
  c4TuningOpen=true;
- sfx.uiTap();
+ sfx.c4TuningBell();
  showScreen(c4TuningHTML(),c4TuningActions);
 }
-function c4ToggleLights(){if(!c4InCar)return;cityCar.lights=!cityCar.lights;sfx.uiTap();updHUD4();}
+function c4ToggleLights(){if(!c4InCar)return;cityCar.lights=!cityCar.lights;if(cityCar.lights)sfx.c4LightsOn();else sfx.c4LightsOff();updHUD4();}
 function updatePlayerCity(dt){
  if(P.stunT>0)P.stunT=Math.max(0,P.stunT-dt);
  var ax,ay;
@@ -16500,7 +16537,7 @@ function fireMachineGunCity(){
  if(P.mgAmmo<=0){sfx.click();centerFlash(L('ПУЛЕМЁТ ПУСТ — [R] ПЕРЕЗАРЯДКА','MACHINE GUN EMPTY — [R] TO RELOAD'),1.4);return;}
  P.mgAmmo--;sfx.c4MgFire();camShake=Math.max(camShake,0.1);
  var o=c4AimOrigin();
- c4Bullets.push({x:o.x+Math.cos(o.a)*22,y:o.y+Math.sin(o.a)*22,vx:Math.cos(o.a)*BULLET_SPEED,vy:Math.sin(o.a)*BULLET_SPEED,dist:0,maxDist:1190,dmg:0.5,pellet:false,mg:true});
+ c4Bullets.push({x:o.x+Math.cos(o.a)*22,y:o.y+Math.sin(o.a)*22,vx:Math.cos(o.a)*BULLET_SPEED,vy:Math.sin(o.a)*BULLET_SPEED,dist:0,maxDist:1190,dmg:0.75,pellet:false,mg:true});
  updHUD4();
 }
 function reloadMgCity(){
@@ -16518,7 +16555,7 @@ function fireSmgCity(){
  P.smgAmmo--;sfx.c4SmgFire();camShake=Math.max(camShake,0.1);
  var o=c4AimOrigin();
  var pa=o.a+(Math.random()*2-1)*0.22;
- c4Bullets.push({x:o.x+Math.cos(o.a)*22,y:o.y+Math.sin(o.a)*22,vx:Math.cos(pa)*BULLET_SPEED,vy:Math.sin(pa)*BULLET_SPEED,dist:0,maxDist:560,dmg:0.6,pellet:false});
+ c4Bullets.push({x:o.x+Math.cos(o.a)*22,y:o.y+Math.sin(o.a)*22,vx:Math.cos(pa)*BULLET_SPEED,vy:Math.sin(pa)*BULLET_SPEED,dist:0,maxDist:560,dmg:0.9,pellet:false});
  updHUD4();
 }
 function reloadSmgCity(){
@@ -16550,10 +16587,12 @@ function c4PickRoulettePrize(){
 }
 var c4RouletteDisplayIcon='❔';
 var c4RouletteLastResult=null;
+var C4_ROULETTE_COST=2;
+var C4_DUP_SKIN_REFUND=35;
 function c4SpinRoulette(){
  if(c4CasinoSpinning)return;
- var cost=1.5,c=save.coins||0;
- if(c<cost){sfx.click();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
+ var cost=C4_ROULETTE_COST,c=save.coins||0;
+ if(c<cost){sfx.c4NotEnoughCoins();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
  save.coins=c-cost;writeSave();
  c4CasinoSpinning=true;c4RouletteLastResult=null;
  var finalPrize=c4PickRoulettePrize();
@@ -16568,15 +16607,23 @@ function c4SpinRoulette(){
    clearInterval(iv);
    c4CasinoSpinning=false;
    c4RouletteDisplayIcon=finalPrize.icon;
-   c4RouletteLastResult=finalPrize;
-   if(finalPrize.kind==='coins'&&finalPrize.amount>0){c4AddCoins(finalPrize.amount,'roulette');sfx.rouletteWin();}
+   c4RouletteLastResult=Object.assign({},finalPrize);
+   if(finalPrize.kind==='coins'&&finalPrize.amount>0){c4AddCoinsRaw(finalPrize.amount,'roulette');sfx.rouletteWin();}
+   else if(finalPrize.kind==='coins'){sfx.rouletteLose();}
    else if(finalPrize.kind==='skin'){
-    if(finalPrize.skin==='pirate'){save.c4PirateWon=true;unlockAch('c4_johnny_depp');}
-    else if(finalPrize.skin==='magician')save.c4MagicianWon=true;
-    else if(finalPrize.skin==='joker')save.c4JokerWon=true;
-    writeSave();
-    if(save.c4MagicianWon&&save.c4JokerWon)unlockAch('c4_lucky');
-    sfx.rouletteWin();
+    var alreadyOwned=finalPrize.skin==='pirate'?save.c4PirateWon:(finalPrize.skin==='magician'?save.c4MagicianWon:save.c4JokerWon);
+    if(alreadyOwned){
+     c4RouletteLastResult.dup=true;
+     c4AddCoinsRaw(C4_DUP_SKIN_REFUND,'dup_skin');
+     sfx.dupSkinRefund();
+    }else{
+     if(finalPrize.skin==='pirate'){save.c4PirateWon=true;unlockAch('c4_johnny_depp');}
+     else if(finalPrize.skin==='magician')save.c4MagicianWon=true;
+     else if(finalPrize.skin==='joker')save.c4JokerWon=true;
+     writeSave();
+     if(save.c4MagicianWon&&save.c4JokerWon)unlockAch('c4_lucky');
+     sfx.rouletteWin();
+    }
    }
   }
   if(c4CasinoOpen&&c4CasinoApp==='roulette')showScreen(c4CasinoAppHTML(),c4CasinoActions);
@@ -16589,7 +16636,7 @@ function c4SpinWheel(){
  if(c4CasinoSpinning)return;
  if(!c4WheelColor){sfx.click();centerFlash(L('ВЫБЕРИТЕ ЦВЕТ','PICK A COLOR'),1.4);return;}
  var bet=c4WheelBet,c=save.coins||0;
- if(c<bet){sfx.click();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
+ if(c<bet){sfx.c4NotEnoughCoins();centerFlash(L('НЕДОСТАТОЧНО МОНЕТ','NOT ENOUGH COINS'),1.6);return;}
  save.coins=c-bet;writeSave();
  c4CasinoSpinning=true;c4WheelLastResult=null;
  var r=Math.random()*100;
@@ -16607,10 +16654,10 @@ function c4SpinWheel(){
    var win=0;
    if(landed===c4WheelColor){
     win=landed==='grey'?bet*25:bet*2;
-    c4AddCoins(win,'wheel');
-    if(landed==='grey')unlockAch('c4_jackpot');
-    sfx.c4WheelWin();
-   }else sfx.click();
+    c4AddCoinsRaw(win,'wheel');
+    if(landed==='grey'){unlockAch('c4_jackpot');sfx.c4WheelJackpot();}
+    else sfx.c4WheelWin();
+   }else sfx.wheelLose();
    c4WheelLastResult={landed:landed,picked:c4WheelColor,bet:bet,win:win};
   }
   if(c4CasinoOpen&&c4CasinoApp==='wheel')showScreen(c4CasinoAppHTML(),c4CasinoActions);
@@ -16647,10 +16694,11 @@ function c4CasinoAppHTML(){
   if(c4RouletteLastResult&&!c4CasinoSpinning){
    var pr=c4RouletteLastResult;
    if(pr.kind==='coins'&&pr.amount>0)html+='<div style="color:#7fae62;font-weight:bold">'+L('ВЫИГРЫШ: +','WIN: +')+pr.amount+'</div>';
+   else if(pr.kind==='skin'&&pr.dup)html+='<div style="color:#8ac0ff;font-weight:bold">'+L('СКИН УЖЕ ЕСТЬ — КОМПЕНСАЦИЯ: +'+C4_DUP_SKIN_REFUND,'SKIN ALREADY OWNED — COMPENSATION: +'+C4_DUP_SKIN_REFUND)+'</div>';
    else if(pr.kind==='skin')html+='<div style="color:#e8c94a;font-weight:bold">'+L('НОВЫЙ СКИН: ','NEW SKIN: ')+L(pr.ru,pr.en)+'!</div>';
    else html+='<div style="color:#8b9b7e">'+L('Пусто. Повезёт в следующий раз.','Nothing. Better luck next time.')+'</div>';
   }
-  html+='<div class="row" style="margin-top:10px"><button data-act="spin_roulette"'+(c<1.5||c4CasinoSpinning?' style="background:#4a1414;border-color:#c04040;color:#ffb0b0"':'')+'>'+L('КРУТИТЬ (1.5 монеты)','SPIN (1.5 coins)')+'</button></div>';
+  html+='<div class="row" style="margin-top:10px"><button data-act="spin_roulette"'+(c<C4_ROULETTE_COST||c4CasinoSpinning?' style="background:#4a1414;border-color:#c04040;color:#ffb0b0"':'')+'>'+L('КРУТИТЬ ('+C4_ROULETTE_COST+' монеты)','SPIN ('+C4_ROULETTE_COST+' coins)')+'</button></div>';
   html+='<div class="lbl" style="margin-top:10px">'+L('ШАНСЫ','ODDS')+'</div><div class="box" style="text-align:left;font-size:12px">'+
    C4_ROULETTE_PRIZES.map(function(p){
     var lbl=p.kind==='skin'?(p.icon+' '+L(p.ru,p.en)):(p.amount>0?(p.icon+' +'+p.amount):(p.icon+' '+L('пусто','nothing')));
@@ -16662,9 +16710,11 @@ function c4CasinoAppHTML(){
  }
  if(c4CasinoApp==='wheel'){
   var wheelColors={red:'#c9302a',black:'#1a1a1a',grey:'#8a8f96'};
+  var wheelNames={red:L('КРАСНОЕ','RED'),black:L('ЧЁРНОЕ','BLACK'),grey:L('СЕРОЕ','GREY')};
   var showColor=c4WheelDisplayColor||'grey';
   html+='<h1 style="letter-spacing:4px;color:#ff4ad0;'+c4CasinoTitleFont()+'">🔴⚫ '+L('КРАСНОЕ / ЧЁРНОЕ / СЕРОЕ','RED / BLACK / GREY')+'</h1>'+
    '<div class="sub">'+L('Ваши монеты: ','Your coins: ')+Math.floor(c)+'</div>'+
+   '<div class="sub">'+L('Ваш выбор: ','Your pick: ')+(c4WheelColor?wheelNames[c4WheelColor]:L('не выбран','none'))+'</div>'+
    '<div class="box" style="text-align:center"><span class="c4-reel" style="display:inline-block;width:60px;height:60px;border-radius:50%;background:'+wheelColors[showColor]+';border:3px solid #444"></span></div>';
   if(c4WheelLastResult&&!c4CasinoSpinning){
    var wr=c4WheelLastResult;
@@ -16673,8 +16723,7 @@ function c4CasinoAppHTML(){
   }
   html+='<div class="lbl" style="margin-top:10px">'+L('ЦВЕТ (x2, серое x25)','COLOR (x2, grey x25)')+'</div><div class="row">'+
    ['red','black','grey'].map(function(col){
-    var names={red:L('КРАСНОЕ','RED'),black:L('ЧЁРНОЕ','BLACK'),grey:L('СЕРОЕ','GREY')};
-    return '<button data-act="pick_'+col+'" style="background:'+(c4WheelColor===col?wheelColors[col]:'#1a1a1a')+';border-color:'+wheelColors[col]+'">'+names[col]+'</button>';
+    return '<button data-act="pick_'+col+'" style="background:'+(c4WheelColor===col?wheelColors[col]:'#1a1a1a')+';border-color:'+wheelColors[col]+'">'+wheelNames[col]+'</button>';
    }).join('')+
    '</div>';
   html+='<div class="lbl" style="margin-top:10px">'+L('СТАВКА','BET')+'</div><div class="row">'+
@@ -16710,7 +16759,7 @@ var c4CasinoActions={
 function c4OpenCasino(){
  c4CasinoOpen=true;
  c4CasinoApp=null;
- sfx.uiTap();
+ sfx.c4CasinoDoor();
  showScreen(c4CasinoAppHTML(),c4CasinoActions);
 }
 /* -- Baton (melee, non-lethal-flavored) -- */
@@ -16967,7 +17016,10 @@ function c4Stars(){
  var successRate=caseTotal>0?completed/caseTotal:1;
  var volumeFactor=Math.min(1,completed/8);
  var civPenalty=Math.max(0,1-civHits*0.15);
- var score=hpFrac*0.3+successRate*0.3+volumeFactor*0.3+civPenalty*0.1;
+ var casinoIdleT=(c4Stats&&c4Stats.casinoIdleT)||0;
+ var casinoPenalty=Math.floor(casinoIdleT/C4_CASINO_IDLE_PENALTY_INTERVAL)*0.1;
+ var score=hpFrac*0.3+successRate*0.3+volumeFactor*0.3+civPenalty*0.1-casinoPenalty;
+ score=Math.round(score*1000)/1000;
  if(score>=0.92)return 5;
  if(score>=0.72)return 4;
  if(score>=0.5)return 3;
@@ -17002,6 +17054,11 @@ function c4EndPatrol(){
 }
 function c4AddCoins(amount,label){
  if(amount>0)amount=Math.round(amount*1.5);
+ save.coins=(save.coins||0)+amount;writeSave();
+ c4CoinPopups.push({x:P.x,y:P.y-30,text:(amount>=0?'+':'')+amount+' COINS',t:0});
+ sfx.pickup();
+}
+function c4AddCoinsRaw(amount,label){
  save.coins=(save.coins||0)+amount;writeSave();
  c4CoinPopups.push({x:P.x,y:P.y-30,text:(amount>=0?'+':'')+amount+' COINS',t:0});
  sfx.pickup();
@@ -17373,7 +17430,7 @@ function c4SpawnArmedRobberyEvent(sp){
   emergeT:99,atkCD:0,dmgFlashT:0,fleeAngle:Math.random()*TAU};
  var ev={id:c4EventSeq++,type:'armed',state:'ACTIVE',priority:'CRITICAL',npc:npc,createdAt:gTime,resolvedAt:0};
  c4Events.push(ev);
- sfx.c4EventSpawn();
+ sfx.c4EventSpawn();sfx.c4EventCritical();
  centerFlash(L('НОВЫЙ ВЫЗОВ: ВООРУЖЁННЫЙ ПРЕСТУПНИК','NEW CALL: ARMED SUSPECT'),2.4);
 }
 function c4UpdateArmedEvent(ev,dt){
@@ -17414,7 +17471,7 @@ function c4SpawnGangEvent(sp){
  }
  var ev={id:c4EventSeq++,type:'gang',state:'ACTIVE',priority:'CRITICAL',npc:{x:sp.x,y:sp.y},npcs:npcs,createdAt:gTime,resolvedAt:0};
  c4Events.push(ev);
- sfx.c4EventSpawn();
+ sfx.c4EventSpawn();sfx.c4EventCritical();
  centerFlash(L('НОВЫЙ ВЫЗОВ: ПЕРЕСТРЕЛКА БАНДЫ','NEW CALL: GANG SHOOTOUT'),2.4);
 }
 function c4UpdateGangEvent(ev,dt){
@@ -17460,7 +17517,7 @@ function c4SpawnPoliceAssistEvent(sp){
  }
  var ev={id:c4EventSeq++,type:'police_assist',state:'ACTIVE',priority:'CRITICAL',npc:{x:sp.x,y:sp.y},npcs:npcs,ally:ally,createdAt:gTime,resolvedAt:0};
  c4Events.push(ev);
- sfx.c4EventSpawn();
+ sfx.c4EventSpawn();sfx.c4EventCritical();
  centerFlash(L('НОВЫЙ ВЫЗОВ: ПОЛИЦЕЙСКОМУ НУЖНА ПОМОЩЬ','NEW CALL: OFFICER NEEDS ASSISTANCE'),2.4);
 }
 function c4UpdatePoliceAssistEvent(ev,dt){
@@ -17472,14 +17529,15 @@ function c4UpdatePoliceAssistEvent(ev,dt){
   centerFlash(L('EVENT ESCAPED — НАПАДАВШИЕ СКРЫЛИСЬ','EVENT ESCAPED — THE ATTACKERS GOT AWAY'),2.4);
   return;
  }
- var aliveCount=0;
+ var aliveCount=0,sumX=0,sumY=0;
  for(var i=0;i<ev.npcs.length;i++){
   var m=ev.npcs[i];
   if(m.hp<=0)continue;
   c4UpdateFightingMember(m,dt);
-  aliveCount++;
+  aliveCount++;sumX+=m.x;sumY+=m.y;
   if(ev.ally.hp>0&&Math.hypot(m.x-ev.ally.x,m.y-ev.ally.y)<300)ev.ally.hp=Math.max(0,ev.ally.hp-dt*1.4);
  }
+ if(aliveCount>0){ev.npc.x=sumX/aliveCount;ev.npc.y=sumY/aliveCount;}
  if(ev.ally.hp<=0&&ev.state==='ACTIVE'){
   ev.state='FAILED';ev.resolvedAt=gTime;
   if(c4Stats)c4Stats.failed=(c4Stats.failed||0)+1;
@@ -17508,7 +17566,7 @@ function c4SpawnHostileVehicleEvent(sp){
  var npc={x:sp.x,y:sp.y,a:ang,speed:340+Math.random()*60,state:'cruising',carHp:26,carHpMax:26,dmgFlashT:0,hostile:true,atkCD:1.4+Math.random()};
  var ev={id:c4EventSeq++,type:'hostile_vehicle',state:'ACTIVE',priority:'CRITICAL',npc:npc,createdAt:gTime,resolvedAt:0};
  c4Events.push(ev);
- sfx.c4EventSpawn();
+ sfx.c4EventSpawn();sfx.c4EventCritical();
  centerFlash(L('НОВЫЙ ВЫЗОВ: ОПАСНЫЙ АВТОМОБИЛЬ ПРОРЫВАЕТСЯ ЧЕРЕЗ ГОРОД','NEW CALL: HOSTILE VEHICLE BREAKING THROUGH THE CITY'),2.4);
 }
 function c4UpdateHostileVehicleEvent(ev,dt){
@@ -18103,8 +18161,18 @@ function drawActiveCallUI(){
  ctx.fillText(dist+'m · '+ev.priority+' PRIORITY',bx0+10,by0+50);
  ctx.restore();
 }
+var C4_CASINO_IDLE_PENALTY_INTERVAL=90;
 function updateCity(dt){
  if(!P)return;
+ if(c4CasinoOpen&&c4Stats){
+  c4Stats.casinoIdleT=(c4Stats.casinoIdleT||0)+dt;
+  var casinoTicks=Math.floor(c4Stats.casinoIdleT/C4_CASINO_IDLE_PENALTY_INTERVAL);
+  if(casinoTicks>(c4Stats.casinoIdleTicksNotified||0)){
+   c4Stats.casinoIdleTicksNotified=casinoTicks;
+   sfx.ratingDown();
+   centerFlash(L('РЕЙТИНГ ПАДАЕТ — ГОРОД ЖДЁТ ПОМОЩИ','YOUR RATING IS DROPPING — THE CITY NEEDS YOU'),1.8);
+  }
+ }
  if(c4MapOpen||c4ShopOpen||c4TuningOpen||c4CasinoOpen)return;
  if(c4InCar)updateCarCity(dt);else updatePlayerCity(dt);
  if(P.cd>0)P.cd=Math.max(0,P.cd-dt);
