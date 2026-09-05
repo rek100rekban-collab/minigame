@@ -3614,12 +3614,11 @@ function mpNormalizeCode(raw){
 var MP_PEER_OPTS={debug:2,secure:location.protocol==='https:',config:{iceServers:[
  {urls:'stun:stun.l.google.com:19302'},
  {urls:'stun:stun1.l.google.com:19302'},
- {urls:'stun:openrelay.metered.ca:80'},
- {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
- {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
- {urls:'turn:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'},
- {urls:'turns:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
- {urls:'turns:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'}
+ {urls:'stun:stun.relay.metered.ca:80'},
+ {urls:'turn:global.relay.metered.ca:80',username:'9be7a5bd3c749e106c59548c',credential:'t9XXq/dgH+wti1d2'},
+ {urls:'turn:global.relay.metered.ca:80?transport=tcp',username:'9be7a5bd3c749e106c59548c',credential:'t9XXq/dgH+wti1d2'},
+ {urls:'turn:global.relay.metered.ca:443',username:'9be7a5bd3c749e106c59548c',credential:'t9XXq/dgH+wti1d2'},
+ {urls:'turns:global.relay.metered.ca:443?transport=tcp',username:'9be7a5bd3c749e106c59548c',credential:'t9XXq/dgH+wti1d2'}
 ],iceCandidatePoolSize:4}};
 var mpConnectTimeoutH=null,mpRegTimeoutH=null;
 var MP_REG_TIMEOUT_MS=12000,MP_CONNECT_TIMEOUT_MS=25000;
@@ -3692,10 +3691,56 @@ function openMultiplayerMenu(){
  fileWarn+
  '<button data-act="mpcreate">'+L('СОЗДАТЬ КОМНАТУ','CREATE ROOM')+'</button>'+
  '<button data-act="mpjoin" style="margin-top:10px">'+L('ВОЙТИ ПО КОДУ','JOIN BY CODE')+'</button>'+
+ '<button data-act="mpnettest" style="margin-top:10px">'+L('ПРОВЕРИТЬ СЕТЬ','TEST NETWORK')+'</button>'+
  '<button data-act="mpname" style="margin-top:10px">'+L('СМЕНИТЬ ИМЯ','CHANGE NAME')+'</button>'+
  '<div class="row" style="margin-top:14px"><button data-act="back">'+L('НАЗАД','BACK')+'</button></div>',
  {mpcreate:function(){mpShowCreateScreen();},mpjoin:function(){mpShowJoinScreen();},
+  mpnettest:function(){mpRunNetworkTest();},
   mpname:function(){mpAskName(openMultiplayerMenu);},back:function(){menuInit();}}
+ );
+}
+function mpRunNetworkTest(){
+ showScreen('<h1 style="letter-spacing:6px">'+L('ПРОВЕРКА СЕТИ...','TESTING NETWORK...')+'</h1>'+
+ '<div class="box">'+L('Подождите 7 секунд, идёт проверка соединения...','Please wait 7 seconds, checking the connection...')+'</div>',
+ {}
+ );
+ var results={host:0,srflx:0,relay:0};
+ var pc=null;
+ try{
+  pc=new RTCPeerConnection(MP_PEER_OPTS.config);
+  pc.createDataChannel('nettest');
+  pc.onicecandidate=function(e){
+   if(!e.candidate)return;
+   var c=(e.candidate.candidate||'').toLowerCase();
+   if(c.indexOf(' typ host')!==-1)results.host++;
+   else if(c.indexOf(' typ srflx')!==-1)results.srflx++;
+   else if(c.indexOf(' typ relay')!==-1)results.relay++;
+  };
+  pc.createOffer().then(function(offer){return pc.setLocalDescription(offer);}).catch(function(){});
+ }catch(e){}
+ setTimeout(function(){
+  if(pc){try{pc.close();}catch(e){}}
+  mpShowNetworkTestResult(results);
+ },7000);
+}
+function mpShowNetworkTestResult(r){
+ var stunOk=r.srflx>0,turnOk=r.relay>0;
+ var line=function(label,ok,count){
+  return '<div style="margin:6px 0">'+(ok?'✅':'❌')+' '+label+' — '+(ok?L('РАБОТАЕТ','WORKS'):L('НЕ РАБОТАЕТ','FAILED'))+' ('+count+')</div>';
+ };
+ var verdict;
+ if(turnOk)verdict=L('TURN-сервер доступен — сетевых блокировок для мультиплеера с этого устройства не обнаружено. Если подключение всё равно не удаётся, проблема может быть на стороне напарника — попросите его тоже пройти эту проверку.','TURN server is reachable — no network blocking detected for multiplayer from this device. If the connection still fails, the problem may be on your partner\'s side — ask them to run this same test.');
+ else if(stunOk)verdict=L('⚠ TURN-сервер (последнее средство для обхода сложных сетей/NAT) НЕДОСТУПЕН. Причина может быть в вашей сети (провайдер/роутер/антивирус блокирует этот трафик) — попробуйте VPN или другую сеть (например, мобильный интернет) и повторите проверку. Но также возможно, что сам бесплатный TURN-сервер сейчас перегружен или недоступен — тогда проблема не на вашей стороне вообще.','⚠ The TURN server (the fallback for difficult networks/NAT) is UNREACHABLE. This could be your network (ISP/router/antivirus blocking this traffic) — try a VPN or a different network (e.g. mobile data) and test again. But it\'s also possible the free TURN service itself is currently overloaded or down — in which case the problem isn\'t on your side at all.');
+ else verdict=L('⚠ Ни STUN, ни TURN не доступны с этого устройства — сетевые функции браузера для мультиплеера, похоже, заблокированы полностью (провайдером, роутером, антивирусом или расширением браузера). Попробуйте VPN или другую сеть.','⚠ Neither STUN nor TURN are reachable from this device — the browser\'s networking features for multiplayer appear to be fully blocked (by your ISP, router, antivirus, or a browser extension). Try a VPN or a different network.');
+ showScreen('<h1 style="letter-spacing:6px">'+L('РЕЗУЛЬТАТ ПРОВЕРКИ','TEST RESULT')+'</h1>'+
+ '<div class="box" style="text-align:left">'+
+ line(L('Локальные адреса','Local addresses'),r.host>0,r.host)+
+ line(L('STUN (прямое соединение)','STUN (direct connection)'),stunOk,r.srflx)+
+ line(L('TURN (обход сложных сетей)','TURN (fallback relay)'),turnOk,r.relay)+
+ '</div>'+
+ '<div class="sub" style="margin-top:10px;max-width:420px">'+verdict+'</div>'+
+ '<div class="row" style="margin-top:14px"><button data-act="back">'+L('НАЗАД','BACK')+'</button></div>',
+ {back:function(){openMultiplayerMenu();}}
  );
 }
 function mpShowCreateScreen(errMsg){
