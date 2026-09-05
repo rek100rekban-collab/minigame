@@ -11,22 +11,22 @@ body{cursor:crosshair;-webkit-user-select:none;user-select:none}
 #game{position:fixed;inset:0;display:block;touch-action:none}
 #touchUI{display:none}
 body.touch #touchUI{display:block}
-body.touch #touchUI .pad{position:fixed;bottom:16px;z-index:9;touch-action:none}
-#tJoyL{left:16px;width:100px;height:100px;border-radius:50%;background:rgba(90,120,80,.14);border:1px solid rgba(150,180,140,.35)}
-#tJoyLKnob{position:absolute;left:28px;top:28px;width:44px;height:44px;border-radius:50%;background:rgba(150,180,140,.4);border:1px solid rgba(200,220,190,.5)}
-#tJoyR{right:16px;width:92px;height:92px;border-radius:50%;background:rgba(180,90,80,.14);border:1px solid rgba(220,140,130,.35)}
-#tJoyRKnob{position:absolute;left:24px;top:24px;width:44px;height:44px;border-radius:50%;background:rgba(220,140,130,.4);border:1px solid rgba(255,190,180,.5)}
-body.touch #touchUI .btn{position:fixed;z-index:9;width:40px;height:40px;border-radius:50%;background:rgba(40,50,35,.55);border:1px solid rgba(170,200,150,.4);color:#e8e3d0;font-size:17px;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;line-height:1}
+body.touch #touchUI .pad{position:fixed;bottom:clamp(12px,2.6vmin,21px);z-index:9;touch-action:none}
+#tJoyL{left:16px;width:clamp(88px,16.4vmin,130px);height:clamp(88px,16.4vmin,130px);border-radius:50%;background:rgba(90,120,80,.14);border:1px solid rgba(150,180,140,.35)}
+#tJoyLKnob{position:absolute;left:28%;top:28%;width:44%;height:44%;border-radius:50%;background:rgba(150,180,140,.4);border:1px solid rgba(200,220,190,.5)}
+#tJoyR{right:16px;width:clamp(82px,15.1vmin,120px);height:clamp(82px,15.1vmin,120px);border-radius:50%;background:rgba(180,90,80,.14);border:1px solid rgba(220,140,130,.35)}
+#tJoyRKnob{position:absolute;left:26%;top:26%;width:48%;height:48%;border-radius:50%;background:rgba(220,140,130,.4);border:1px solid rgba(255,190,180,.5)}
+body.touch #touchUI .btn{position:fixed;z-index:9;width:clamp(34px,6.6vmin,52px);height:clamp(34px,6.6vmin,52px);border-radius:50%;background:rgba(40,50,35,.55);border:1px solid rgba(170,200,150,.4);color:#e8e3d0;font-size:clamp(14px,2.8vmin,22px);display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;line-height:1}
 body.touch #touchUI .btn:active{background:rgba(90,120,80,.6)}
-#tBtnFire{right:126px;bottom:104px;width:50px;height:50px;font-size:22px;background:rgba(120,40,30,.55);border-color:rgba(230,150,140,.5)}
-#tBtnFire:active{background:rgba(170,60,40,.65)}
-#tBtnE{right:184px;bottom:110px}
-#tBtnQ{right:126px;bottom:160px}
-#tBtnG{right:184px;bottom:160px}
-#tBtnR{right:126px;bottom:210px}
-#tBtnF{right:184px;bottom:210px}
-#tBtnU{right:126px;bottom:258px}
-#tBtnEsc{left:14px;top:14px;width:34px;height:34px;font-size:14px}
+#touchUI #tBtnFire{right:clamp(104px,20.7vmin,164px);bottom:clamp(86px,17.1vmin,135px);width:clamp(42px,8.2vmin,65px);height:clamp(42px,8.2vmin,65px);font-size:clamp(18px,3.6vmin,29px);background:rgba(120,40,30,.55);border-color:rgba(230,150,140,.5)}
+#touchUI #tBtnFire:active{background:rgba(170,60,40,.65)}
+#tBtnE{right:clamp(150px,30.2vmin,239px);bottom:clamp(92px,18vmin,143px)}
+#tBtnQ{right:clamp(104px,20.7vmin,164px);bottom:clamp(130px,26.2vmin,208px)}
+#tBtnG{right:clamp(150px,30.2vmin,239px);bottom:clamp(130px,26.2vmin,208px)}
+#tBtnR{right:clamp(104px,20.7vmin,164px);bottom:clamp(168px,34.4vmin,273px)}
+#tBtnF{right:clamp(150px,30.2vmin,239px);bottom:clamp(168px,34.4vmin,273px)}
+#tBtnU{right:clamp(104px,20.7vmin,164px);bottom:clamp(206px,42.3vmin,335px)}
+#touchUI #tBtnEsc{left:14px;top:14px;width:clamp(30px,5.6vmin,44px);height:clamp(30px,5.6vmin,44px);font-size:clamp(12px,2.3vmin,18px)}
 #rotateHint{display:none;position:fixed;inset:0;z-index:100;background:#05070a;color:#cfd6cf;font-family:'Courier New',monospace;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:16px;letter-spacing:1px;line-height:1.6}
 body.touch.portrait #rotateHint{display:flex}
 body.touch.portrait #game,body.touch.portrait .hud,body.touch.portrait #touchUI{display:none}
@@ -36,17 +36,6 @@ body.touch.portrait #game,body.touch.portrait .hud,body.touch.portrait #touchUI{
  #stats{font-size:12px}
  #bossBar .bn{font-size:12px}
  #achToast{top:96px;width:min(280px,72vw)}
- #tJoyL{bottom:12px;width:88px;height:88px}
- #tJoyR{bottom:12px;width:82px;height:82px}
- body.touch #touchUI .btn{width:34px;height:34px;font-size:14px}
- #tBtnFire{right:104px;bottom:86px;width:42px;height:42px;font-size:18px}
- #tBtnE{right:150px;bottom:92px}
- #tBtnQ{right:104px;bottom:130px}
- #tBtnG{right:150px;bottom:130px}
- #tBtnR{right:104px;bottom:168px}
- #tBtnF{right:150px;bottom:168px}
- #tBtnU{right:104px;bottom:206px}
- #tBtnEsc{width:30px;height:30px;font-size:12px}
 }
 @media (max-height:520px){
  #screen{padding-top:10px}
@@ -1615,9 +1604,9 @@ addEventListener('contextmenu',function(e){e.preventDefault();});
  var joyL=document.getElementById('tJoyL'),knobL=document.getElementById('tJoyLKnob');
  var joyR=document.getElementById('tJoyR'),knobR=document.getElementById('tJoyRKnob');
  if(isTouchDevice()){touchAim.active=true;touchAim.angle=0;mouse.x=W/2+150;mouse.y=H/2;}
- function bindStick(base,knob,radius,onMove,onEnd){
+ function bindStick(base,knob,onMove,onEnd){
   var id=null;
-  function center(){var r=base.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2};}
+  function center(){var r=base.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,radius:r.width/2};}
   function start(e){
    if(id!==null)return;
    var t=e.changedTouches[0];id=t.identifier;
@@ -1627,10 +1616,10 @@ addEventListener('contextmenu',function(e){e.preventDefault();});
   function handle(t){
    var c=center();
    var dx=t.clientX-c.x,dy=t.clientY-c.y,d=Math.hypot(dx,dy);
-   var cl=Math.min(d,radius);
+   var cl=Math.min(d,c.radius);
    var nx=d>0?dx/d*cl:0,ny=d>0?dy/d*cl:0;
    knob.style.transform='translate('+nx+'px,'+ny+'px)';
-   onMove(dx/radius,dy/radius,d/radius);
+   onMove(dx/c.radius,dy/c.radius,d/c.radius);
   }
   function move(e){
    for(var i=0;i<e.changedTouches.length;i++){
@@ -1650,13 +1639,13 @@ addEventListener('contextmenu',function(e){e.preventDefault();});
   addEventListener('touchend',end,{passive:false});
   addEventListener('touchcancel',end,{passive:false});
  }
- bindStick(joyL,knobL,42,function(nx,ny){
+ bindStick(joyL,knobL,function(nx,ny){
   touchMove.active=true;
   var m=Math.min(1,Math.hypot(nx,ny));
   var a=Math.atan2(ny,nx);
   touchMove.x=Math.cos(a)*m;touchMove.y=Math.sin(a)*m;
  },function(){touchMove.active=false;touchMove.x=0;touchMove.y=0;});
- bindStick(joyR,knobR,38,function(nx,ny,m){
+ bindStick(joyR,knobR,function(nx,ny,m){
   if(m>0.12){
    touchAim.active=true;touchAim.angle=Math.atan2(ny,nx);
    mouse.x=W/2+Math.cos(touchAim.angle)*150;
@@ -4125,9 +4114,17 @@ function mpLocalInput(){
  if(mode!=='play')return{up:false,down:false,left:false,right:false,aim:mpMe?mpMe.a:0,fire:false,altFire:false,sprint:false};
  var mpz=cam.zoom||1;
  var wx=cam.x+(mouse.x-W/2)/mpz,wy=cam.y+(mouse.y-H/2)/mpz;
- return {up:!!(keys.KeyW||keys.ArrowUp),down:!!(keys.KeyS||keys.ArrowDown),
-  left:!!(keys.KeyA||keys.ArrowLeft),right:!!(keys.KeyD||keys.ArrowRight),
-  aim:Math.atan2(wy-mpMe.y,wx-mpMe.x),fire:!!(mouse.l||touchFire),altFire:!!(mouse.r||touchAltFire),sprint:!!(keys.ShiftLeft||keys.ShiftRight)};
+ var up,down,left,right,sprint;
+ if(touchMove.active){
+  up=touchMove.y<-0.15;down=touchMove.y>0.15;left=touchMove.x<-0.15;right=touchMove.x>0.15;
+  sprint=Math.hypot(touchMove.x,touchMove.y)>0.82;
+ }else{
+  up=!!(keys.KeyW||keys.ArrowUp);down=!!(keys.KeyS||keys.ArrowDown);
+  left=!!(keys.KeyA||keys.ArrowLeft);right=!!(keys.KeyD||keys.ArrowRight);
+  sprint=!!(keys.ShiftLeft||keys.ShiftRight);
+ }
+ return {up:up,down:down,left:left,right:right,
+  aim:Math.atan2(wy-mpMe.y,wx-mpMe.x),fire:!!(mouse.l||touchFire),altFire:!!(mouse.r||touchAltFire),sprint:sprint};
 }
 var mpEmptyClickCD=0;
 function mpCheckLocalFeedback(inp,dt){
@@ -4201,10 +4198,14 @@ function mpRespawn(pl){
  pl.x=MP_CX+Math.cos(ang)*80;pl.y=MP_CY+Math.sin(ang)*80;
  mpClampArena(pl,14);
 }
+function mpMobileZoomMul(){
+ var REF=1280;
+ return W<REF?clamp(Math.sqrt(W/REF),0.55,1):1;
+}
 function mpUpdateCamera(dt){
  var midX=(mpMe.x+mpOther.x)/2,midY=(mpMe.y+mpOther.y)/2;
  var dx=mpOther.x-mpMe.x,dy=mpOther.y-mpMe.y,sep=Math.hypot(dx,dy);
- var targetZoom=sep>650?clamp(1-(sep-650)/1900,0.42,1):1;
+ var targetZoom=(sep>650?clamp(1-(sep-650)/1900,0.42,1):1)*mpMobileZoomMul();
  cam.zoom=(cam.zoom||1)+(targetZoom-(cam.zoom||1))*Math.min(1,dt*14);
  cam.x+=(midX-cam.x)*Math.min(1,dt*4);
  cam.y+=(midY-cam.y)*Math.min(1,dt*4);
